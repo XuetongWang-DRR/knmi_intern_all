@@ -1140,13 +1140,13 @@ Rdata = cbind.data.frame(read.table("E:/output/radar_output/2018_11_9km.txt",sep
                              read.table("E:/output/radar_output/2021_03_9km.txt",sep = "", header = T),
                              read.table("E:/output/radar_output/2021_04_9km.txt",sep = "", header = T))
                              
-new = read.table("E:/output/time_information.txt", sep = "", header = T)
-new = t(new)
-colnames(new) = c(1:2424)
-colnames(Rdata) = c(1:2424)
-Rdata = rbind.data.frame(new,Rdata)
+#new = read.table("E:/output/time_information.txt", sep = "\t", header = T)
+#new = t(new)
+#colnames(new) = c(1:2424)
+#colnames(Rdata) = c(1:2424)
+#Rdata = rbind.data.frame(new,Rdata)
                              
-write.table(Rdata, "time_information.txt", sep = "\t", col.names = T, row.names = F)
+#write.table(Rdata, "time_information.txt", sep = "\t", col.names = T, row.names = F)
 
                              
                              
