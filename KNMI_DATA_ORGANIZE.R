@@ -1066,25 +1066,45 @@ write.table(merge_kurtosis, "Snow_6h_kurtosis_2018.txt", sep = "\t", col.names =
 #Read forecast data and radar data
 library(dplyr)
 ECmean201811 = read.table("E:/ECMWFdata/pre-process/Y2018/RR_6h_mean_2018_Nov.txt",sep = "", header = T)
+ECmean201811 = ECmean201811[-1,]
 ECmean201812 = read.table("E:/ECMWFdata/pre-process/Y2018/RR_6h_mean_2018_Dec.txt",sep = "", header = T)
+ECmean201812 = ECmean201812[-1,]
 ECmean201901 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_mean_2019_Jan.txt",sep = "", header = T)
+ECmean201901 = ECmean201901[-1,]
 ECmean201902 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_mean_2019_Feb.txt",sep = "", header = T)
+ECmean201902 = ECmean201902[-1,]
 ECmean201903 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_mean_2019_Mar.txt",sep = "", header = T)
+ECmean201903 = ECmean201903[-1,]
 ECmean201904 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_mean_2019_Apr.txt",sep = "", header = T)
+ECmean201904 = ECmean201904[-1,]
 ECmean201910 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_mean_2019_Oct.txt",sep = "", header = T)
+ECmean201910 = ECmean201910[-1,]
 ECmean201911 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_mean_2019_Nov.txt",sep = "", header = T)
+ECmean201911 = ECmean201911[-1,]
 ECmean201912 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_mean_2019_Dec.txt",sep = "", header = T)
+ECmean201912 = ECmean201912[-1,]
 ECmean202001 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_Jan.txt",sep = "", header = T)
+ECmean202001 = ECmean202001[-1,]
 ECmean202002 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_Feb.txt",sep = "", header = T)
+ECmean202002 = ECmean202002[-1,]
 ECmean202003 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_Mar.txt",sep = "", header = T)
+ECmean202003 = ECmean202003[-1,]
 ECmean202004 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_Apr.txt",sep = "", header = T)
+ECmean202004 = ECmean202004[-1,]
 ECmean202010 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_Oct.txt",sep = "", header = T)
+ECmean202010 = ECmean202010[-1,]
 ECmean202011 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_Nov.txt",sep = "", header = T)
+ECmean202011 = ECmean202011[-1,]
 ECmean202012 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_Dec.txt",sep = "", header = T)
+ECmean202012 = ECmean202012[-1,]
 ECmean202101 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_mean_2021_Jan.txt",sep = "", header = T)
+ECmean202101 = ECmean202101[-1,]
 ECmean202102 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_mean_2021_Feb.txt",sep = "", header = T)
+ECmean202102 = ECmean202102[-1,]
 ECmean202103 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_mean_2021_Mar.txt",sep = "", header = T)
+ECmean202103 = ECmean202103[-1,]
 ECmean202104 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_mean_2021_Apr.txt",sep = "", header = T)
+ECmean202104 = ECmean202104[-1,]
 
 
 
@@ -1093,25 +1113,45 @@ ECmean202104 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_mean_2021_Apr.tx
 
 
 ECsd201811 = read.table("E:/ECMWFdata/pre-process/Y2018/RR_6h_sd_2018_Nov.txt",sep = "", header = T)
+ECsd201811 = ECsd201811[-1,]
 ECsd201812 = read.table("E:/ECMWFdata/pre-process/Y2018/RR_6h_sd_2018_Dec.txt",sep = "", header = T)
+ECsd201812 = ECsd201812[-1,]
 ECsd201901 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_sd_2019_Jan.txt",sep = "", header = T)
+ECsd201901 = ECsd201901[-1,]
 ECsd201902 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_sd_2019_Feb.txt",sep = "", header = T)
+ECsd201902 = ECsd201902[-1,]
 ECsd201903 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_sd_2019_Mar.txt",sep = "", header = T)
+ECsd201903 = ECsd201903[-1,]
 ECsd201904 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_sd_2019_Apr.txt",sep = "", header = T)
+ECsd201904 = ECsd201904[-1,]
 ECsd201910 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_sd_2019_Oct.txt",sep = "", header = T)
+ECsd201910 = ECsd201910[-1,]
 ECsd201911 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_sd_2019_Nov.txt",sep = "", header = T)
+ECsd201911 = ECsd201911[-1,]
 ECsd201912 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_sd_2019_Dec.txt",sep = "", header = T)
+ECsd201912 = ECsd201912[-1,]
 ECsd202001 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_Jan.txt",sep = "", header = T)
+ECsd202001 = ECsd202001[-1,]
 ECsd202002 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_Feb.txt",sep = "", header = T)
+ECsd202002 = ECsd202002[-1,]
 ECsd202003 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_Mar.txt",sep = "", header = T)
+ECsd202003 = ECsd202003[-1,]
 ECsd202004 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_Apr.txt",sep = "", header = T)
+ECsd202004 = ECsd202004[-1,]
 ECsd202010 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_Oct.txt",sep = "", header = T)
+ECsd202010 = ECsd202010[-1,]
 ECsd202011 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_Nov.txt",sep = "", header = T)
+ECsd202011 = ECsd202011[-1,]
 ECsd202012 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_Dec.txt",sep = "", header = T)
+ECsd202012 = ECsd202012[-1,]
 ECsd202101 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_sd_2021_Jan.txt",sep = "", header = T)
+ECsd202101 = ECsd202101[-1,]
 ECsd202102 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_sd_2021_Feb.txt",sep = "", header = T)
+ECsd202102 = ECsd202102[-1,]
 ECsd202103 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_sd_2021_Mar.txt",sep = "", header = T)
+ECsd202103 = ECsd202103[-1,]
 ECsd202104 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_sd_2021_Apr.txt",sep = "", header = T)
+ECsd202104 = ECsd202104[-1,]
 
 
 
@@ -1151,240 +1191,53 @@ Rdata = cbind.data.frame(read.table("E:/output/radar_output/2018_11_9km.txt",sep
                              
                              
                              
-                             
+library(lubridate)                             
 
 upscal_match = read.table("E:/KNMI_DATA/upscal_match_9km.txt", sep = "", header = T)
 colnames(Rdata) = c(1:dim(Rdata)[2])
 #Match data temporally
 Rdata$rID = upscal_match$rID
 Rdata$dfID = upscal_match$dfID
-#EC for 201811
-ECmean201811 = ECmean201811[-1,-62]
-ECsd201811 = ECsd201811[-1,-62]
-ECmean201811$day = as.numeric(substr(ECmean201811$second_category,3,4))
-ECmean201811$time = as.numeric(substr(ECmean201811$second_category,5,6))
-ECmean201811$grid = as.numeric(substr(ECmean201811$second_category,12,15))
-ECmean201811$Rtime = (ECmean201811$day-1)*4+(ECmean201811$time/6)
-ECsd201811$day = as.numeric(substr(ECsd201811$second_category,3,4))
-ECsd201811$time = as.numeric(substr(ECsd201811$second_category,5,6))
-ECsd201811$grid = as.numeric(substr(ECsd201811$second_category,12,15))
-ECsd201811$Rtime = (ECsd201811$day-1)*4+(ECsd201811$time/6)
-#EC for 201812
-ECmean201812 = ECmean201812[-1,-62]
-ECsd201812 = ECsd201812[-1,-62]
-ECmean201812$day = as.numeric(substr(ECmean201812$second_category,3,4))
-ECmean201812$time = as.numeric(substr(ECmean201812$second_category,5,6))
-ECmean201812$grid = as.numeric(substr(ECmean201812$second_category,12,15))
-ECmean201812$Rtime = (ECmean201812$day-1)*4+(ECmean201812$time/6)+120
-ECsd201812$day = as.numeric(substr(ECsd201812$second_category,3,4))
-ECsd201812$time = as.numeric(substr(ECsd201812$second_category,5,6))
-ECsd201812$grid = as.numeric(substr(ECsd201812$second_category,12,15))
-ECsd201812$Rtime = (ECsd201812$day-1)*4+(ECsd201812$time/6)+120
-#EC for 201901
-ECmean201901 = ECmean201901[-1,-62]
-ECsd201901 = ECsd201901[-1,-62]
-ECmean201901$day = as.numeric(substr(ECmean201901$second_category,3,4))
-ECmean201901$time = as.numeric(substr(ECmean201901$second_category,5,6))
-ECmean201901$grid = as.numeric(substr(ECmean201901$second_category,12,15))
-ECmean201901$Rtime = (ECmean201901$day-1)*4+(ECmean201901$time/6)+(30*4)+(31*4)
-ECsd201901$day = as.numeric(substr(ECsd201901$second_category,3,4))
-ECsd201901$time = as.numeric(substr(ECsd201901$second_category,5,6))
-ECsd201901$grid = as.numeric(substr(ECsd201901$second_category,12,15))
-ECsd201901$Rtime = (ECsd201901$day-1)*4+(ECsd201901$time/6)+(30*4)+(31*4)
-#EC for 201902
-ECmean201902 = ECmean201902[-1,-62]
-ECsd201902 = ECsd201902[-1,-62]
-ECmean201902$day = as.numeric(substr(ECmean201902$second_category,3,4))
-ECmean201902$time = as.numeric(substr(ECmean201902$second_category,5,6))
-ECmean201902$grid = as.numeric(substr(ECmean201902$second_category,12,15))
-ECmean201902$Rtime = (ECmean201902$day-1)*4+(ECmean201902$time/6)+(30*4)+(31*4)+(31*4)
-ECsd201902$day = as.numeric(substr(ECsd201902$second_category,3,4))
-ECsd201902$time = as.numeric(substr(ECsd201902$second_category,5,6))
-ECsd201902$grid = as.numeric(substr(ECsd201902$second_category,12,15))
-ECsd201902$Rtime = (ECsd201902$day-1)*4+(ECsd201902$time/6)+(30*4)+(31*4)+(31*4)
-#EC for 201903
-ECmean201903 = ECmean201903[-1,-62]
-ECsd201903 = ECsd201903[-1,-62]
-ECmean201903$day = as.numeric(substr(ECmean201903$second_category,3,4))
-ECmean201903$time = as.numeric(substr(ECmean201903$second_category,5,6))
-ECmean201903$grid = as.numeric(substr(ECmean201903$second_category,12,15))
-ECmean201903$Rtime = (ECmean201903$day-1)*4+(ECmean201903$time/6)+(30*4)+(31*4)+(31*4)+(28*4)
-ECsd201903$day = as.numeric(substr(ECsd201903$second_category,3,4))
-ECsd201903$time = as.numeric(substr(ECsd201903$second_category,5,6))
-ECsd201903$grid = as.numeric(substr(ECsd201903$second_category,12,15))
-ECsd201903$Rtime = (ECsd201903$day-1)*4+(ECsd201903$time/6)+(30*4)+(31*4)+(31*4)+(28*4)
-#EC for 201904
-ECmean201904 = ECmean201904[-1,-62]
-ECsd201904 = ECsd201904[-1,-62]
-ECmean201904$day = as.numeric(substr(ECmean201904$second_category,3,4))
-ECmean201904$time = as.numeric(substr(ECmean201904$second_category,5,6))
-ECmean201904$grid = as.numeric(substr(ECmean201904$second_category,12,15))
-ECmean201904$Rtime = (ECmean201904$day-1)*4+(ECmean201904$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)
-ECsd201904$day = as.numeric(substr(ECsd201904$second_category,3,4))
-ECsd201904$time = as.numeric(substr(ECsd201904$second_category,5,6))
-ECsd201904$grid = as.numeric(substr(ECsd201904$second_category,12,15))
-ECsd201904$Rtime = (ECsd201904$day-1)*4+(ECsd201904$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)
-#EC for 201910
-ECmean201910 = ECmean201910[-1,-62]
-ECsd201910 = ECsd201910[-1,-62]
-ECmean201910$day = as.numeric(substr(ECmean201910$second_category,3,4))
-ECmean201910$time = as.numeric(substr(ECmean201910$second_category,5,6))
-ECmean201910$grid = as.numeric(substr(ECmean201910$second_category,12,15))
-ECmean201910$Rtime = (ECmean201910$day-1)*4+(ECmean201910$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)
-ECsd201910$day = as.numeric(substr(ECsd201910$second_category,3,4))
-ECsd201910$time = as.numeric(substr(ECsd201910$second_category,5,6))
-ECsd201910$grid = as.numeric(substr(ECsd201910$second_category,12,15))
-ECsd201910$Rtime = (ECsd201910$day-1)*4+(ECsd201910$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)
-#EC for 201911
-ECmean201911 = ECmean201911[-1,-62]
-ECsd201911 = ECsd201911[-1,-62]
-ECmean201911$day = as.numeric(substr(ECmean201911$second_category,3,4))
-ECmean201911$time = as.numeric(substr(ECmean201911$second_category,5,6))
-ECmean201911$grid = as.numeric(substr(ECmean201911$second_category,12,15))
-ECmean201911$Rtime = (ECmean201911$day-1)*4+(ECmean201911$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)
-ECsd201911$day = as.numeric(substr(ECsd201911$second_category,3,4))
-ECsd201911$time = as.numeric(substr(ECsd201911$second_category,5,6))
-ECsd201911$grid = as.numeric(substr(ECsd201911$second_category,12,15))
-ECsd201911$Rtime = (ECsd201911$day-1)*4+(ECsd201911$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)
-#EC for 201912
-ECmean201912 = ECmean201912[-1,-62]
-ECsd201912 = ECsd201912[-1,-62]
-ECmean201912$day = as.numeric(substr(ECmean201912$second_category,3,4))
-ECmean201912$time = as.numeric(substr(ECmean201912$second_category,5,6))
-ECmean201912$grid = as.numeric(substr(ECmean201912$second_category,12,15))
-ECmean201912$Rtime = (ECmean201912$day-1)*4+(ECmean201912$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)
-ECsd201912$day = as.numeric(substr(ECsd201912$second_category,3,4))
-ECsd201912$time = as.numeric(substr(ECsd201912$second_category,5,6))
-ECsd201912$grid = as.numeric(substr(ECsd201912$second_category,12,15))
-ECsd201912$Rtime = (ECsd201912$day-1)*4+(ECsd201912$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)
-#EC for 202001
-ECmean202001 = ECmean202001[-1,-62]
-ECsd202001 = ECsd202001[-1,-62]
-ECmean202001$day = as.numeric(substr(ECmean202001$second_category,3,4))
-ECmean202001$time = as.numeric(substr(ECmean202001$second_category,5,6))
-ECmean202001$grid = as.numeric(substr(ECmean202001$second_category,12,15))
-ECmean202001$Rtime = (ECmean202001$day-1)*4+(ECmean202001$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)
-ECsd202001$day = as.numeric(substr(ECsd202001$second_category,3,4))
-ECsd202001$time = as.numeric(substr(ECsd202001$second_category,5,6))
-ECsd202001$grid = as.numeric(substr(ECsd202001$second_category,12,15))
-ECsd202001$Rtime = (ECsd202001$day-1)*4+(ECsd202001$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)
-#EC for 202002
-ECmean202002 = ECmean202002[-1,-62]
-ECsd202002 = ECsd202002[-1,-62]
-ECmean202002$day = as.numeric(substr(ECmean202002$second_category,3,4))
-ECmean202002$time = as.numeric(substr(ECmean202002$second_category,5,6))
-ECmean202002$grid = as.numeric(substr(ECmean202002$second_category,12,15))
-ECmean202002$Rtime = (ECmean202002$day-1)*4+(ECmean202002$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)
-ECsd202002$day = as.numeric(substr(ECsd202002$second_category,3,4))
-ECsd202002$time = as.numeric(substr(ECsd202002$second_category,5,6))
-ECsd202002$grid = as.numeric(substr(ECsd202002$second_category,12,15))
-ECsd202002$Rtime = (ECsd202002$day-1)*4+(ECsd202002$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)
-#EC for 202003
-ECmean202003 = ECmean202003[-1,-62]
-ECsd202003 = ECsd202003[-1,-62]
-ECmean202003$day = as.numeric(substr(ECmean202003$second_category,3,4))
-ECmean202003$time = as.numeric(substr(ECmean202003$second_category,5,6))
-ECmean202003$grid = as.numeric(substr(ECmean202003$second_category,12,15))
-ECmean202003$Rtime = (ECmean202003$day-1)*4+(ECmean202003$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)
-ECsd202003$day = as.numeric(substr(ECsd202003$second_category,3,4))
-ECsd202003$time = as.numeric(substr(ECsd202003$second_category,5,6))
-ECsd202003$grid = as.numeric(substr(ECsd202003$second_category,12,15))
-ECsd202003$Rtime = (ECsd202003$day-1)*4+(ECsd202003$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)
-#EC for 202004
-ECmean202004 = ECmean202004[-1,-62]
-ECsd202004 = ECsd202004[-1,-62]
-ECmean202004$day = as.numeric(substr(ECmean202004$second_category,3,4))
-ECmean202004$time = as.numeric(substr(ECmean202004$second_category,5,6))
-ECmean202004$grid = as.numeric(substr(ECmean202004$second_category,12,15))
-ECmean202004$Rtime = (ECmean202004$day-1)*4+(ECmean202004$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)+(31*4)
-ECsd202004$day = as.numeric(substr(ECsd202004$second_category,3,4))
-ECsd202004$time = as.numeric(substr(ECsd202004$second_category,5,6))
-ECsd202004$grid = as.numeric(substr(ECsd202004$second_category,12,15))
-ECsd202004$Rtime = (ECsd202004$day-1)*4+(ECsd202004$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)+(31*4)
-#EC for 202010
-ECmean202010 = ECmean202010[-1,-62]
-ECsd202010 = ECsd202010[-1,-62]
-ECmean202010$day = as.numeric(substr(ECmean202010$second_category,3,4))
-ECmean202010$time = as.numeric(substr(ECmean202010$second_category,5,6))
-ECmean202010$grid = as.numeric(substr(ECmean202010$second_category,12,15))
-ECmean202010$Rtime = (ECmean202010$day-1)*4+(ECmean202010$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)+(31*4)+(30*4)
-ECsd202010$day = as.numeric(substr(ECsd202010$second_category,3,4))
-ECsd202010$time = as.numeric(substr(ECsd202010$second_category,5,6))
-ECsd202010$grid = as.numeric(substr(ECsd202010$second_category,12,15))
-ECsd202010$Rtime = (ECsd202010$day-1)*4+(ECsd202010$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)+(31*4)+(30*4)
-#EC for 202011
-ECmean202011 = ECmean202011[-1,-62]
-ECsd202011 = ECsd202011[-1,-62]
-ECmean202011$day = as.numeric(substr(ECmean202011$second_category,3,4))
-ECmean202011$time = as.numeric(substr(ECmean202011$second_category,5,6))
-ECmean202011$grid = as.numeric(substr(ECmean202011$second_category,12,15))
-ECmean202011$Rtime = (ECmean202011$day-1)*4+(ECmean202011$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)+(31*4)+(30*4)+(31*4)
-ECsd202011$day = as.numeric(substr(ECsd202011$second_category,3,4))
-ECsd202011$time = as.numeric(substr(ECsd202011$second_category,5,6))
-ECsd202011$grid = as.numeric(substr(ECsd202011$second_category,12,15))
-ECsd202011$Rtime = (ECsd202011$day-1)*4+(ECsd202011$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)+(31*4)+(30*4)+(31*4)
-#EC for 202012
-ECmean202012 = ECmean202012[-1,-62]
-ECsd202012 = ECsd202012[-1,-62]
-ECmean202012$day = as.numeric(substr(ECmean202012$second_category,3,4))
-ECmean202012$time = as.numeric(substr(ECmean202012$second_category,5,6))
-ECmean202012$grid = as.numeric(substr(ECmean202012$second_category,12,15))
-ECmean202012$Rtime = (ECmean202012$day-1)*4+(ECmean202012$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)+(31*4)+(30*4)+(31*4)+(30*4)                 
-ECsd202012$day = as.numeric(substr(ECsd202012$second_category,3,4))
-ECsd202012$time = as.numeric(substr(ECsd202012$second_category,5,6))
-ECsd202012$grid = as.numeric(substr(ECsd202012$second_category,12,15))
-ECsd202012$Rtime = (ECsd202012$day-1)*4+(ECsd202012$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)+(31*4)+(30*4)+(31*4)+(30*4)
-#EC for 202101
-ECmean202101 = ECmean202101[-1,-62]
-ECsd202101 = ECsd202101[-1,-62]
-ECmean202101$day = as.numeric(substr(ECmean202101$second_category,3,4))
-ECmean202101$time = as.numeric(substr(ECmean202101$second_category,5,6))
-ECmean202101$grid = as.numeric(substr(ECmean202101$second_category,12,15))
-ECmean202101$Rtime = (ECmean202101$day-1)*4+(ECmean202101$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)                 
-ECsd202101$day = as.numeric(substr(ECsd202101$second_category,3,4))
-ECsd202101$time = as.numeric(substr(ECsd202101$second_category,5,6))
-ECsd202101$grid = as.numeric(substr(ECsd202101$second_category,12,15))
-ECsd202101$Rtime = (ECsd202101$day-1)*4+(ECsd202101$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)
-#EC for 202102
-ECmean202102 = ECmean202102[-1,-62]
-ECsd202102 = ECsd202102[-1,-62]
-ECmean202102$day = as.numeric(substr(ECmean202102$second_category,3,4))
-ECmean202102$time = as.numeric(substr(ECmean202102$second_category,5,6))
-ECmean202102$grid = as.numeric(substr(ECmean202102$second_category,12,15))
-ECmean202102$Rtime = (ECmean202102$day-1)*4+(ECmean202102$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)                 
-ECsd202102$day = as.numeric(substr(ECsd202102$second_category,3,4))
-ECsd202102$time = as.numeric(substr(ECsd202102$second_category,5,6))
-ECsd202102$grid = as.numeric(substr(ECsd202102$second_category,12,15))
-ECsd202102$Rtime = (ECsd202102$day-1)*4+(ECsd202102$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)
-#EC for 202103
-ECmean202103 = ECmean202102[-1,-62]
-ECsd202103 = ECsd202102[-1,-62]
-ECmean202103$day = as.numeric(substr(ECmean202103$second_category,3,4))
-ECmean202103$time = as.numeric(substr(ECmean202103$second_category,5,6))
-ECmean202103$grid = as.numeric(substr(ECmean202103$second_category,12,15))
-ECmean202103$Rtime = (ECmean202103$day-1)*4+(ECmean202103$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(28*4)                 
-ECsd202103$day = as.numeric(substr(ECsd202103$second_category,3,4))
-ECsd202103$time = as.numeric(substr(ECsd202103$second_category,5,6))
-ECsd202103$grid = as.numeric(substr(ECsd202103$second_category,12,15))
-ECsd202103$Rtime = (ECsd202103$day-1)*4+(ECsd202103$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(28*4)
-#EC for 202104
-ECmean202104 = ECmean202104[-1,-62]
-ECsd202104 = ECsd202104[-1,-62]
-ECmean202104$day = as.numeric(substr(ECmean202104$second_category,3,4))
-ECmean202104$time = as.numeric(substr(ECmean202104$second_category,5,6))
-ECmean202104$grid = as.numeric(substr(ECmean202104$second_category,12,15))
-ECmean202104$Rtime = (ECmean202104$day-1)*4+(ECmean202104$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)                 
-ECsd202104$day = as.numeric(substr(ECsd202104$second_category,3,4))
-ECsd202104$time = as.numeric(substr(ECsd202104$second_category,5,6))
-ECsd202104$grid = as.numeric(substr(ECsd202104$second_category,12,15))
-ECsd202104$Rtime = (ECsd202104$day-1)*4+(ECsd202104$time/6)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(29*4)+(31*4)+(30*4)+(31*4)+(30*4)+(31*4)+(31*4)+(28*4)+(31*4)
 
+#add time information for EC data
 ECmean = rbind.data.frame(ECmean201811, ECmean201812, ECmean201901, ECmean201902, ECmean201903, ECmean201904, ECmean201910, ECmean201911,
                           ECmean201912, ECmean202001, ECmean202002, ECmean202003, ECmean202004, ECmean202010, ECmean202011, ECmean202012,
                           ECmean202101, ECmean202102, ECmean202103, ECmean202104)
 ECsd = rbind.data.frame(ECsd201811, ECsd201812, ECsd201901, ECsd201902, ECsd201903, ECsd201904, ECsd201910, ECsd201911, ECsd201912,
                         ECsd202001, ECsd202002, ECsd202003, ECsd202004, ECsd202010, ECsd202011, ECsd202012, ECsd202101, ECsd202102,
                         ECsd202103, ECsd202104)
+
+rm(ECmean201811,ECmean201812,ECmean201901,ECmean201902,ECmean201903,ECmean201904,ECmean201910,ECmean201911,
+   ECmean201912,ECmean202001,ECmean202002,ECmean202003,ECmean202004,ECmean202010,ECmean202011,ECmean202012,
+   ECmean202101,ECmean202102,ECmean202103,ECmean202104,ECsd201811,ECsd201812,ECsd201901,ECsd201902,ECsd201903,
+   ECsd201904,ECsd201910,ECsd201911,ECsd201912,ECsd202001,ECsd202002,ECsd202003,ECsd202004,ECsd202010,
+   ECsd202011,ECsd202012,ECsd202101,ECsd202102,ECsd202103,ECsd202104)    
+
+
+ECmean$grid = as.numeric(substr(ECmean$second_category,12,15))
+ECsd$grid = as.numeric(substr(ECsd$second_category,12,15))
+
+
+ECmean$Rtime = as.POSIXct("2000-1-1 01:00:00", tz = "UTC")
+year(ECmean$Rtime) = as.numeric(substr(ECmean$first_category,10,13))
+month(ECmean$Rtime) = as.numeric(substr(ECmean$first_category,14,15))
+mday(ECmean$Rtime) = as.numeric(substr(ECmean$first_category,16,17))
+hour(ECmean$Rtime) = as.numeric(substr(ECmean$first_category,18,19))
+minute(ECmean$Rtime) = 00
+second(ECmean$Rtime) = 00
+
+ECsd$Rtime = as.POSIXct("2000-1-1 01:00:00", tz = "UTC")
+year(ECsd$Rtime) = as.numeric(substr(ECsd$first_category,10,13))
+month(ECsd$Rtime) = as.numeric(substr(ECsd$first_category,14,15))
+mday(ECsd$Rtime) = as.numeric(substr(ECsd$first_category,16,17))
+hour(ECsd$Rtime) = as.numeric(substr(ECsd$first_category,18,19))
+minute(ECsd$Rtime) = 00
+second(ECsd$Rtime) = 00
+
+
+
+
+
 
 
 
