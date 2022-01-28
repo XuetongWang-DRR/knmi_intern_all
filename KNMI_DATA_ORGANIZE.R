@@ -47,8 +47,8 @@ for (k in 1:n){
 
 
 
-saveRDS(object = df, file = "ECME_NNL_2020110100.rds")
-tf2 = readRDS(file = "ECME_NNL_2020110100.rds")
+saveRDS(object = mod1, file = "toy model for RR.rds")
+mod1 = readRDS(file = "toy model for RR.rds")
 
 r = read.table("D:/ITC/KNMI/radar_data/radar_coord.dat", sep = ",")
 r = r[-1,]
@@ -108,6 +108,29 @@ nl.data <- merge(model.data, ra_nl, by.x="rID",by.y ="raid")
 
 setwd("E:/KNMI_DATA")
 write.table(model.data, "matchdata.txt", sep = "\t", col.names = T, row.names = F)
+#####Basic function for working on R#########################################################
+#1. 批量更改文件夹里的文件名
+setwd("E:/ECMWFdata/pre-process/Y2021")
+files<-list.files()
+
+for (f in files){
+  newname<-sub('Apr','04',f) #将原文件中的字符xt，替换为字符ab
+  file.rename(f,newname)
+}
+#2. 忽略NA
+na.rm = T
+#3. ggplot作图
+
+ggplot(r %>% mutate(celln = 1:nrow(r))) + geom_point(aes(x = V3, y = V2, col = celln))
+head(as.data.frame(ra, xy=TRUE))
+
+p <- ggplot(final,aes(x=EC4p0final1, y=R4final1))+geom_point(size = 1, shape = 21)+xlab("p0")+ylab("Observation")+
+    xlim(0, 20) + ylim(0,20) + ggtitle("Observation versus p0 for 60 hours forecast time") 
+#4.写入/读取mod格式文件
+saveRDS(object = mod1, file = "toy model for RR.rds")
+setwd("E:/output")
+mod1 = readRDS(file = "toy model for RR.rds")
+
 ####check with radar data-------------------------------------------------------------------------------
 
 
@@ -164,7 +187,19 @@ b$grid = rep(c(1:242), each = 40)
 library(ncdf4)
 library(raster)
 rb = nc_open("D:/ITC/KNMI/radar_data/09-20211013T195924Z-001/09/RAD_NL25_RAC_MFBS_01H_202009010200.nc")
-ra = raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912292300.nc")
+ra = raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912311300.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912311400.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912311500.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912311600.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912311700.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912311800.nc")
+
+plot(ra, main = "Radar Precipitation for 6 hours (mm)", xlim = c(200,600), ylim = c(-4300,-3800))
+
+
+
+
+
 ra = as.data.frame(ra)
 ra$ID = (1:dim(ra)[1])
 ra = na.omit(ra)
@@ -355,9 +390,9 @@ ggplot(radar_output) +
 
 
 
-setwd("E:/RadarData/2020")
-first_category_name = list.files("11")
-dir = paste("E:/RadarData/2020/11/",first_category_name,sep="")
+setwd("E:/RadarData/2018")
+first_category_name = list.files("12")
+dir = paste("E:/RadarData/2018/12/",first_category_name,sep="")
 n = length(dir) 
 
 radar_combine = as.data.frame(matrix(0,nrow = 599, ncol = n))
@@ -397,7 +432,7 @@ new_df = radar_combine
 
 f <- matrix(0, dim(new_df)[1], dim(new_df)[2] %/% 6 )
 for (j in seq(1, (dim(new_df)[2] - dim(new_df)[2] %% 6), by = 6)) {
-  f[, (j - 1) / 6 + 1] <- rowSums(new_df[, j:(j + 5)])
+  f[, (j - 1) / 6 + 1] <- rowSums(new_df[, j:(j + 5)],na.rm=TRUE)
 }
 
 f = as.data.frame(f)
@@ -585,10 +620,10 @@ write.table(merge_q90_cos, "WDIR_6h_q90_cos.txt", sep = "\t", col.names = T, row
 
 ####(for_RR) (mm)###############################################################################################    
 library(e1071)
-setwd('E:/ECMWFdata/ECME_2021')
+setwd('E:/ECMWFdata/ECME_2020')
 # data = read.delim("E:/ECMWFdata/ECME_2019/Dec/ECME_NNL_2019121512/ECME_NNL_201912151200_NL084_LC",sep = "", header = F)
-first_category_name = list.files("Jan")
-dir = paste("./Jan/",first_category_name,sep="")
+first_category_name = list.files("Feb")
+dir = paste("./Feb/",first_category_name,sep="")
 n = length(dir) 
 n_sub<-rep(0,n)
 n_sub<-as.data.frame(n_sub)
@@ -825,6 +860,434 @@ write.table(merge_p10, "RR_6h_p10_2018.txt", sep = "\t", col.names = T, row.name
 write.table(merge_p20, "RR_6h_p20_2018.txt", sep = "\t", col.names = T, row.names = F)
 write.table(merge_skewness, "RR_6h_skewness_2018.txt", sep = "\t", col.names = T, row.names = F)
 write.table(merge_kurtosis, "RR_6h_kurtosis_2018.txt", sep = "\t", col.names = T, row.names = F)
+
+#####（for_convectiveRR)##########################################################################
+library(e1071)
+Sys.time()
+setwd('E:/ECMWFdata/ECME_2018')
+# data = read.delim("E:/ECMWFdata/ECME_2019/Dec/ECME_NNL_2019121512/ECME_NNL_201912151200_NL084_LC",sep = "", header = F)
+first_category_name = list.files("Dec")
+dir = paste("./Dec/",first_category_name,sep="")
+n = length(dir) 
+n_sub<-rep(0,n)
+n_sub<-as.data.frame(n_sub)
+n_sub<-t(n_sub)
+head(n_sub)
+# create df2 for conRR
+#create the df for HRES
+merge_HRES_conRR = as.data.frame(matrix(1:40,nrow = 1, ncol = 40))
+names(merge_HRES_conRR) = c(1:40)
+merge_HRES_conRR$second_category <- 'second_category'
+merge_HRES_conRR$first_category <- 'first_category'
+#create the df for avg
+merge_avg_conRR = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_avg_conRR) = c(1:60)
+merge_avg_conRR$second_category <- 'second_category'
+merge_avg_conRR$first_category <- 'first_category'
+#create the df for sd
+merge_sd_conRR = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_sd_conRR) = c(1:60)
+merge_sd_conRR$second_category <- 'second_category'
+merge_sd_conRR$first_category <- 'first_category'
+#create the df for median
+merge_median_conRR = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_median_conRR) = c(1:60)
+merge_median_conRR$second_category <- 'second_category'
+merge_median_conRR$first_category <- 'first_category'
+#create the df for q10
+merge_q10_conRR = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q10_conRR) = c(1:60)
+merge_q10_conRR$second_category <- 'second_category'
+merge_q10_conRR$first_category <- 'first_category'
+#create the df for q90
+merge_q90_conRR = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q90_conRR) = c(1:60)
+merge_q90_conRR$second_category <- 'second_category'
+merge_q90_conRR$first_category <- 'first_category'
+#create the df for q25
+merge_q25_conRR = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q25_conRR) = c(1:60)
+merge_q25_conRR$second_category <- 'second_category'
+merge_q25_conRR$first_category <- 'first_category'
+#create the df for q75
+merge_q75_conRR = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q75_conRR) = c(1:60)
+merge_q75_conRR$second_category <- 'second_category'
+merge_q75_conRR$first_category <- 'first_category'
+#create the df for p0.05
+merge_p0.05_conRR = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_p0.05_conRR) = c(1:60)
+merge_p0.05_conRR$second_category <- 'second_category'
+merge_p0.05_conRR$first_category <- 'first_category'
+#create the df for p0.3
+merge_p0.3_conRR = as.data.frame(matrix(1:60, nrow = 1, ncol = 60))
+names(merge_p0.3_conRR) = c(1:60)
+merge_p0.3_conRR$second_category <- 'second_category'
+merge_p0.3_conRR$first_category <- 'first_category'
+#create the df for p10
+merge_p10_conRR = as.data.frame(matrix(1:60, nrow = 1, ncol = 60))
+names(merge_p10_conRR) = c(1:60)
+merge_p10_conRR$second_category <- 'second_category'
+merge_p10_conRR$first_category <- 'first_category'
+
+#create the df for min
+merge_min_conRR = as.data.frame(matrix(1:60, nrow = 1, ncol = 60))
+names(merge_min_conRR) = c(1:60)
+merge_min_conRR$second_category <- 'second_category'
+merge_min_conRR$first_category <- 'first_category'
+
+#create the df for max
+merge_max_conRR = as.data.frame(matrix(1:60, nrow = 1, ncol = 60))
+names(merge_max_conRR) = c(1:60)
+merge_max_conRR$second_category <- 'second_category'
+merge_max_conRR$first_category <- 'first_category'
+
+
+
+
+for(i in 1:n){         #对于每个一级目录(文件夹)
+  b=list.files(dir[i]) #b是列出每个一级目录(文件夹)中每个xlsx文件的名称
+  n_sub[i]=length(b)   #得到一级目录(文件夹)下xlsx的文件个数:n_sub
+  
+
+  for(j in 1:n_sub[i]){     #对于每个一级目录(文件夹)下的每个xlsx文件
+    data<-read.delim(file=paste(dir[i],'/',b[j],sep=''),sep = "", header = F) #读取xlsx文件
+    #conRRcum (mm)
+    data_conRRcum = data[691:743,]
+    data_conRRcum[,48:83]=trunc(data_conRRcum[,48:83]/1000000)
+    data_conRRcum[2,64]=data_conRRcum[2,64]/10^234
+    data_conRRcum = as.data.frame(lapply(data_conRRcum,as.numeric))
+    data_conRRcum[2:53,]=data_conRRcum[2:53,]/10
+    conRRcum_6hstep = data_conRRcum[,c(2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,49:84)]
+    #conv precip (mm)
+    conRR_6hstep = conRRcum_6hstep[,1:(ncol(conRRcum_6hstep)-1)]
+    conRR_6hstep = cbind(0,conRR_6hstep)
+    conRRcum_6hstep = as.data.frame(lapply(conRRcum_6hstep,as.numeric))
+    conRR_6hstep = as.data.frame(lapply(conRR_6hstep,as.numeric))
+    conRR_6hstep = conRRcum_6hstep-conRR_6hstep
+    conRR_HRES = conRR_6hstep[2,1:40]
+    conRR_ENS = conRR_6hstep[3:53,]
+    conRR_ENS = as.data.frame(lapply(conRR_ENS,as.numeric))
+    avg_var_df <- as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+    sd_var_df <- as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+    median_var_df <- as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+    q10_var_df <- as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+    q90_var_df <- as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+    q25_var_df <- as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+    q75_var_df <- as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+    p0.05_var_df <- as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+    p0.3_var_df <- as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+    p10_var_df <- as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+    min_var_df <- as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+    max_var_df <- as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+    
+    for(k in 1:ncol(conRR_ENS)){ 
+      #  p0 <- colSums(RR_ENS>0)/length(RR_ENS[,k])   
+      avg_var_df[,k] <- mean(conRR_ENS[, k])
+      sd_var_df[,k] <- sd(conRR_ENS[,k])
+      median_var_df[,k] <- median(conRR_ENS[,k])
+      q10_var_df[,k] = quantile(conRR_ENS[,k],probs=0.1)
+      q25_var_df[,k] = quantile(conRR_ENS[,k],probs=0.25)
+      q75_var_df[,k] = quantile(conRR_ENS[,k],probs=0.75)
+      q90_var_df[,k] = quantile(conRR_ENS[,k],probs=0.9)
+      p0.05_var_df[,k] = sum(conRR_ENS[,k] > 0.05)/length(conRR_ENS[,k])
+      p0.3_var_df[,k] = sum(conRR_ENS[,k] > 0.3)/length(conRR_ENS[,k])
+      p10_var_df[,k] = sum(conRR_ENS[,k] > 10)/length(conRR_ENS[,k])
+      min_var_df[,k] <- min(conRR_ENS[, k])
+      max_var_df[,k] <- max(conRR_ENS[,k])
+
+    }    
+    
+    
+    #new row for HRES
+    #    new_HRES = RR_HRES
+    names(conRR_HRES)<-c(1:40)
+    conRR_HRES$second_category<-substr(b[j],14,27)      
+    conRR_HRES$first_category<-first_category_name[i]   
+    merge_HRES_conRR<-rbind(merge_HRES_conRR,conRR_HRES)
+    #new row for avg
+    #    new_avg = avg_var_df
+    names(avg_var_df)<-c(1:60)
+    avg_var_df$second_category<-substr(b[j],14,27)       
+    avg_var_df$first_category<-first_category_name[i] 
+    merge_avg_conRR<-rbind(merge_avg_conRR,avg_var_df)    
+    #new row for sd
+    #    new_sd = sd_var_df
+    names(sd_var_df)<-c(1:60)
+    sd_var_df$second_category<-substr(b[j],14,27)       
+    sd_var_df$first_category<-first_category_name[i] 
+    merge_sd_conRR<-rbind(merge_sd_conRR,sd_var_df) 
+    #new row for median
+    #    new_median = median_var_df
+    names(median_var_df)<-c(1:60)
+    median_var_df$second_category<-substr(b[j],14,27)       
+    median_var_df$first_category<-first_category_name[i] 
+    merge_median_conRR<-rbind(merge_median_conRR,median_var_df)
+    #new row for q10
+    #    new_q10 = q10_var_df
+    names(q10_var_df)<-c(1:60)
+    q10_var_df$second_category<-substr(b[j],14,27)       
+    q10_var_df$first_category<-first_category_name[i] 
+    merge_q10_conRR<-rbind(merge_q10_conRR,q10_var_df)
+    #new row for q90
+    #    new_q90 = q90_var_df
+    names(q90_var_df)<-c(1:60)
+    q90_var_df$second_category<-substr(b[j],14,27)       
+    q90_var_df$first_category<-first_category_name[i] 
+    merge_q90_conRR<-rbind(merge_q90_conRR,q90_var_df)
+    #new row for q25
+    names(q25_var_df)<-c(1:60)
+    q25_var_df$second_category<-substr(b[j],14,27)       
+    q25_var_df$first_category<-first_category_name[i] 
+    merge_q25_conRR<-rbind(merge_q25_conRR,q25_var_df)
+    #new row for q75
+    names(q75_var_df)<-c(1:60)
+    q75_var_df$second_category<-substr(b[j],14,27)       
+    q75_var_df$first_category<-first_category_name[i] 
+    merge_q75_conRR<-rbind(merge_q75_conRR,q75_var_df)
+    
+    #new row for p0
+    #    new_p0 = p0_var_df
+    names(p0.05_var_df)<-c(1:60)
+    p0.05_var_df$second_category<-substr(b[j],14,27)       
+    p0.05_var_df$first_category<-first_category_name[i] 
+    merge_p0.05_conRR<-rbind(merge_p0.05_conRR,p0.05_var_df)    
+    #new row for p1
+    #    new_p1 = p1_var_df
+    names(p0.3_var_df)<-c(1:60)
+    p0.3_var_df$second_category<-substr(b[j],14,27)       
+    p0.3_var_df$first_category<-first_category_name[i] 
+    merge_p0.3_conRR<-rbind(merge_p0.3_conRR,p0.3_var_df)   
+    
+    #new row for p10
+    #    new_p10 = p10_var_df
+    names(p10_var_df)<-c(1:60)
+    p10_var_df$second_category<-substr(b[j],14,27)       
+    p10_var_df$first_category<-first_category_name[i] 
+    merge_p10_conRR<-rbind(merge_p10_conRR,p10_var_df)  
+
+    #new row for min
+    names(min_var_df)<-c(1:60)
+    min_var_df$second_category<-substr(b[j],14,27)       
+    min_var_df$first_category<-first_category_name[i] 
+    merge_min_conRR<-rbind(merge_min_conRR,min_var_df)    
+    #new row for max
+    names(max_var_df)<-c(1:60)
+    max_var_df$second_category<-substr(b[j],14,27)       
+    max_var_df$first_category<-first_category_name[i] 
+    merge_max_conRR<-rbind(merge_max_conRR,max_var_df)    
+  }
+}    
+
+Sys.time()
+setwd("E:/ECMWFdata/pre-process")
+write.table(merge_HRES_conRR, "conRR_6h_HRES_2018_12.txt", sep = "\t", col.names = T, row.names = F)
+write.table(merge_avg_conRR, "conRR_6h_mean_2018_12.txt", sep = "\t", col.names = T, row.names = F)
+write.table(merge_sd_conRR, "conRR_6h_sd_2018_12.txt", sep = "\t", col.names = T, row.names = F)
+write.table(merge_median_conRR, "conRR_6h_median_2018_12.txt", sep = "\t", col.names = T, row.names = F)
+write.table(merge_q10_conRR, "conRR_6h_q10_2018_12.txt", sep = "\t", col.names = T, row.names = F)
+write.table(merge_q90_conRR, "conRR_6h_q90_2018_12.txt", sep = "\t", col.names = T, row.names = F)
+write.table(merge_q25_conRR, "conRR_6h_q25_2018_12.txt", sep = "\t", col.names = T, row.names = F)
+write.table(merge_q75_conRR, "conRR_6h_q75_2018_12.txt", sep = "\t", col.names = T, row.names = F)
+write.table(merge_p0.05_conRR, "conRR_6h_p0.05_2018_12.txt", sep = "\t", col.names = T, row.names = F)
+write.table(merge_p0.3_conRR, "conRR_6h_p0.3_2018_12.txt", sep = "\t", col.names = T, row.names = F)
+write.table(merge_p10_conRR, "conRR_6h_p10_2018_12.txt", sep = "\t", col.names = T, row.names = F)
+write.table(merge_min_conRR, "conRR_6h_min_2018_12.txt", sep = "\t", col.names = T, row.names = F)
+write.table(merge_max_conRR, "conRR_6h_max_2018_12.txt", sep = "\t", col.names = T, row.names = F)
+
+
+#######(For other predictors)#####################################
+#create the df for avg
+merge_avg_CC = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_avg_CC) = c(1:60)
+merge_avg_CC$second_category <- 'second_category'
+merge_avg_CC$first_category <- 'first_category'
+
+merge_avg_cape = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_avg_cape) = c(1:60)
+merge_avg_cape$second_category <- 'second_category'
+merge_avg_cape$first_category <- 'first_category'
+
+merge_avg_capeS = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_avg_capeS) = c(1:60)
+merge_avg_capeS$second_category <- 'second_category'
+merge_avg_capeS$first_category <- 'first_category'
+
+merge_avg_eva = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_avg_eva) = c(1:60)
+merge_avg_eva$second_category <- 'second_category'
+merge_avg_eva$first_category <- 'first_category'
+
+#create the df for sd
+merge_sd_CC = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_sd_CC) = c(1:60)
+merge_sd_CC$second_category <- 'second_category'
+merge_sd_CC$first_category <- 'first_category'
+
+merge_sd_cape = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_sd_cape) = c(1:60)
+merge_sd_cape$second_category <- 'second_category'
+merge_sd_cape$first_category <- 'first_category'
+
+merge_sd_capeS = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_sd_capeS) = c(1:60)
+merge_sd_capeS$second_category <- 'second_category'
+merge_sd_capeS$first_category <- 'first_category'
+
+merge_sd_eva = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_sd_eva) = c(1:60)
+merge_sd_eva$second_category <- 'second_category'
+merge_sd_eva$first_category <- 'first_category'
+
+#create the df for median
+merge_median_CC = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_median_CC) = c(1:60)
+merge_median_CC$second_category <- 'second_category'
+merge_median_CC$first_category <- 'first_category'
+
+merge_median_cape = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_median_cape) = c(1:60)
+merge_median_cape$second_category <- 'second_category'
+merge_median_cape$first_category <- 'first_category'
+
+merge_median_capeS = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_median_capeS) = c(1:60)
+merge_median_capeS$second_category <- 'second_category'
+merge_median_capeS$first_category <- 'first_category'
+
+merge_median_eva = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_median_eva) = c(1:60)
+merge_median_eva$second_category <- 'second_category'
+merge_median_eva$first_category <- 'first_category'
+
+#create the df for q10
+merge_q10_CC = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q10_CC) = c(1:60)
+merge_q10_CC$second_category <- 'second_category'
+merge_q10_CC$first_category <- 'first_category'
+
+merge_q10_cape = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q10_cape) = c(1:60)
+merge_q10_cape$second_category <- 'second_category'
+merge_q10_cape$first_category <- 'first_category'
+
+merge_q10_capeS = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q10_capeS) = c(1:60)
+merge_q10_capeS$second_category <- 'second_category'
+merge_q10_capeS$first_category <- 'first_category'
+
+merge_q10_eva = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q10_eva) = c(1:60)
+merge_q10_eva$second_category <- 'second_category'
+merge_q10_eva$first_category <- 'first_category'
+
+#create the df for q25
+merge_q25_CC = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q25_CC) = c(1:60)
+merge_q25_CC$second_category <- 'second_category'
+merge_q25_CC$first_category <- 'first_category'
+
+merge_q25_cape = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q25_cape) = c(1:60)
+merge_q25_cape$second_category <- 'second_category'
+merge_q25_cape$first_category <- 'first_category'
+
+merge_q25_capeS = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q25_capeS) = c(1:60)
+merge_q25_capeS$second_category <- 'second_category'
+merge_q25_capeS$first_category <- 'first_category'
+
+merge_q25_eva = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q25_eva) = c(1:60)
+merge_q25_eva$second_category <- 'second_category'
+merge_q25_eva$first_category <- 'first_category'
+
+
+#createe the df for q75
+merge_q75_CC = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q75_CC) = c(1:60)
+merge_q75_CC$second_category <- 'second_category'
+merge_q75_CC$first_category <- 'first_category'
+
+merge_q75_cape = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q75_cape) = c(1:60)
+merge_q75_cape$second_category <- 'second_category'
+merge_q75_cape$first_category <- 'first_category'
+
+merge_q75_capeS = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q75_capeS) = c(1:60)
+merge_q75_capeS$second_category <- 'second_category'
+merge_q75_capeS$first_category <- 'first_category'
+
+merge_q75_eva = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q75_eva) = c(1:60)
+merge_q75_eva$second_category <- 'second_category'
+merge_q75_eva$first_category <- 'first_category'
+
+#create the df for q90
+merge_q90_CC = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q90_CC) = c(1:60)
+merge_q90_CC$second_category <- 'second_category'
+merge_q90_CC$first_category <- 'first_category'
+
+merge_q90_cape = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q90_cape) = c(1:60)
+merge_q90_cape$second_category <- 'second_category'
+merge_q90_cape$first_category <- 'first_category'
+
+merge_q90_capeS = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q90_capeS) = c(1:60)
+merge_q90_capeS$second_category <- 'second_category'
+merge_q90_capeS$first_category <- 'first_category'
+
+merge_q90_eva = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_q90_eva) = c(1:60)
+merge_q90_eva$second_category <- 'second_category'
+merge_q90_eva$first_category <- 'first_category'
+
+#create the df for min
+merge_min_CC = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_min_CC) = c(1:60)
+merge_min_CC$second_category <- 'second_category'
+merge_min_CC$first_category <- 'first_category'
+
+merge_min_cape = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_min_cape) = c(1:60)
+merge_min_cape$second_category <- 'second_category'
+merge_min_cape$first_category <- 'first_category'
+
+merge_min_capeS = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_min_capeS) = c(1:60)
+merge_min_capeS$second_category <- 'second_category'
+merge_min_capeS$first_category <- 'first_category'
+
+merge_min_eva = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_min_eva) = c(1:60)
+merge_min_eva$second_category <- 'second_category'
+merge_min_eva$first_category <- 'first_category'
+
+#create the df for max
+merge_max_CC = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_max_CC) = c(1:60)
+merge_max_CC$second_category <- 'second_category'
+merge_max_CC$first_category <- 'first_category'
+
+merge_max_cape = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_max_cape) = c(1:60)
+merge_max_cape$second_category <- 'second_category'
+merge_max_cape$first_category <- 'first_category'
+
+merge_max_capeS = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_max_capeS) = c(1:60)
+merge_max_capeS$second_category <- 'second_category'
+merge_max_capeS$first_category <- 'first_category'
+
+merge_max_eva = as.data.frame(matrix(1:60,nrow = 1, ncol = 60))
+names(merge_max_eva) = c(1:60)
+merge_max_eva$second_category <- 'second_category'
+merge_max_eva$first_category <- 'first_category'
+
+
 
 #####(For WSPD)#################################################################################################
 #WSPD (m/s)
@@ -3123,32 +3586,32 @@ ECmean201911 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_mean_2019_11.txt
 ECmean201911 = ECmean201911[-1,]
 ECmean201912 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_mean_2019_12.txt",sep = "", header = T)
 ECmean201912 = ECmean201912[-1,]
-ECmean202001 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_Jan.txt",sep = "", header = T)
+ECmean202001 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_01.txt",sep = "", header = T)
 ECmean202001 = ECmean202001[-1,]
-ECmean202002 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_Feb.txt",sep = "", header = T)
+ECmean202002 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_02.txt",sep = "", header = T)
 ECmean202002 = ECmean202002[-1,]
-ECmean202003 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_Mar.txt",sep = "", header = T)
+ECmean202003 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_03.txt",sep = "", header = T)
 ECmean202003 = ECmean202003[-1,]
-ECmean202004 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_Apr.txt",sep = "", header = T)
+ECmean202004 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_04.txt",sep = "", header = T)
 ECmean202004 = ECmean202004[-1,]
-ECmean202010 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_Oct.txt",sep = "", header = T)
+ECmean202010 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_10.txt",sep = "", header = T)
 ECmean202010 = ECmean202010[-1,]
-ECmean202011 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_Nov.txt",sep = "", header = T)
+ECmean202011 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_11.txt",sep = "", header = T)
 ECmean202011 = ECmean202011[-1,]
-ECmean202012 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_Dec.txt",sep = "", header = T)
+ECmean202012 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_mean_2020_12.txt",sep = "", header = T)
 ECmean202012 = ECmean202012[-1,]
-ECmean202101 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_mean_2021_Jan.txt",sep = "", header = T)
+ECmean202101 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_mean_2021_01.txt",sep = "", header = T)
 ECmean202101 = ECmean202101[-1,]
-ECmean202102 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_mean_2021_Feb.txt",sep = "", header = T)
+ECmean202102 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_mean_2021_02.txt",sep = "", header = T)
 ECmean202102 = ECmean202102[-1,]
-ECmean202103 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_mean_2021_Mar.txt",sep = "", header = T)
+ECmean202103 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_mean_2021_03.txt",sep = "", header = T)
 ECmean202103 = ECmean202103[-1,]
-ECmean202104 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_mean_2021_Apr.txt",sep = "", header = T)
+ECmean202104 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_mean_2021_04.txt",sep = "", header = T)
 ECmean202104 = ECmean202104[-1,]
 
-ECmean = rbind.data.frame(ECmean201811, ECmean201812, ECmean201901, ECmean201902, ECmean201903, ECmean201904, ECmean201910, ECmean201911,
-                          ECmean201912, ECmean202001, ECmean202002, ECmean202003, ECmean202004, ECmean202010, ECmean202011, ECmean202012,
-                          ECmean202101, ECmean202102, ECmean202103, ECmean202104)
+ECmean = rbind.data.frame(ECmean201811, ECmean201812, ECmean201901, ECmean201902, ECmean201903, ECmean201904, ECmean201910,
+                          ECmean201911, ECmean201912, ECmean202001, ECmean202002, ECmean202003, ECmean202004, ECmean202010, 
+                          ECmean202011, ECmean202012, ECmean202101, ECmean202102, ECmean202103, ECmean202104)
 
 
 
@@ -3174,27 +3637,27 @@ ECsd201911 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_sd_2019_11.txt",se
 ECsd201911 = ECsd201911[-1,]
 ECsd201912 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_sd_2019_12.txt",sep = "", header = T)
 ECsd201912 = ECsd201912[-1,]
-ECsd202001 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_Jan.txt",sep = "", header = T)
+ECsd202001 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_01.txt",sep = "", header = T)
 ECsd202001 = ECsd202001[-1,]
-ECsd202002 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_Feb.txt",sep = "", header = T)
+ECsd202002 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_02.txt",sep = "", header = T)
 ECsd202002 = ECsd202002[-1,]
-ECsd202003 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_Mar.txt",sep = "", header = T)
+ECsd202003 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_03.txt",sep = "", header = T)
 ECsd202003 = ECsd202003[-1,]
-ECsd202004 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_Apr.txt",sep = "", header = T)
+ECsd202004 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_04.txt",sep = "", header = T)
 ECsd202004 = ECsd202004[-1,]
-ECsd202010 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_Oct.txt",sep = "", header = T)
+ECsd202010 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_10.txt",sep = "", header = T)
 ECsd202010 = ECsd202010[-1,]
-ECsd202011 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_Nov.txt",sep = "", header = T)
+ECsd202011 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_11.txt",sep = "", header = T)
 ECsd202011 = ECsd202011[-1,]
-ECsd202012 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_Dec.txt",sep = "", header = T)
+ECsd202012 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_sd_2020_12.txt",sep = "", header = T)
 ECsd202012 = ECsd202012[-1,]
-ECsd202101 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_sd_2021_Jan.txt",sep = "", header = T)
+ECsd202101 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_sd_2021_01.txt",sep = "", header = T)
 ECsd202101 = ECsd202101[-1,]
-ECsd202102 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_sd_2021_Feb.txt",sep = "", header = T)
+ECsd202102 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_sd_2021_02.txt",sep = "", header = T)
 ECsd202102 = ECsd202102[-1,]
-ECsd202103 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_sd_2021_Mar.txt",sep = "", header = T)
+ECsd202103 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_sd_2021_03.txt",sep = "", header = T)
 ECsd202103 = ECsd202103[-1,]
-ECsd202104 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_sd_2021_Apr.txt",sep = "", header = T)
+ECsd202104 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_sd_2021_04.txt",sep = "", header = T)
 ECsd202104 = ECsd202104[-1,]
 
 ECsd = rbind.data.frame(ECsd201811, ECsd201812, ECsd201901, ECsd201902, ECsd201903, ECsd201904, ECsd201910, ECsd201911, ECsd201912,
@@ -3220,52 +3683,68 @@ ECmedian201911 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_median_2019_11
 ECmedian201911 = ECmedian201911[-1,]
 ECmedian201912 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_median_2019_12.txt",sep = "", header = T)
 ECmedian201912 = ECmedian201912[-1,]
-ECmedian202001 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_median_2020_Jan.txt",sep = "", header = T)
+ECmedian202001 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_median_2020_01.txt",sep = "", header = T)
 ECmedian202001 = ECmedian202001[-1,]
-ECmedian202002 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_median_2020_Feb.txt",sep = "", header = T)
+ECmedian202002 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_median_2020_02.txt",sep = "", header = T)
 ECmedian202002 = ECmedian202002[-1,]
-ECmedian202003 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_median_2020_Mar.txt",sep = "", header = T)
+ECmedian202003 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_median_2020_03.txt",sep = "", header = T)
 ECmedian202003 = ECmedian202003[-1,]
-ECmedian202004 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_median_2020_Apr.txt",sep = "", header = T)
+ECmedian202004 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_median_2020_04.txt",sep = "", header = T)
 ECmedian202004 = ECmedian202004[-1,]
-ECmedian202010 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_median_2020_Oct.txt",sep = "", header = T)
+ECmedian202010 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_median_2020_10.txt",sep = "", header = T)
 ECmedian202010 = ECmedian202010[-1,]
-ECmedian202011 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_median_2020_Nov.txt",sep = "", header = T)
+ECmedian202011 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_median_2020_11.txt",sep = "", header = T)
 ECmedian202011 = ECmedian202011[-1,]
-ECmedian202012 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_median_2020_Dec.txt",sep = "", header = T)
+ECmedian202012 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_median_2020_12.txt",sep = "", header = T)
 ECmedian202012 = ECmedian202012[-1,]
-ECmedian202101 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_median_2021_Jan.txt",sep = "", header = T)
+ECmedian202101 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_median_2021_01.txt",sep = "", header = T)
 ECmedian202101 = ECmedian202101[-1,]
-ECmedian202102 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_median_2021_Feb.txt",sep = "", header = T)
+ECmedian202102 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_median_2021_02.txt",sep = "", header = T)
 ECmedian202102 = ECmedian202102[-1,]
-ECmedian202103 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_median_2021_Mar.txt",sep = "", header = T)
+ECmedian202103 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_median_2021_03.txt",sep = "", header = T)
 ECmedian202103 = ECmedian202103[-1,]
-ECmedian202104 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_median_2021_Apr.txt",sep = "", header = T)
+ECmedian202104 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_median_2021_04.txt",sep = "", header = T)
 ECmedian202104 = ECmedian202104[-1,]
 
 ECmedian = rbind.data.frame(ECmedian201811,ECmedian201812, ECmedian201901, ECmedian201902, ECmedian201903, ECmedian201904, ECmedian201910, ECmedian201911,
                             ECmedian201912, ECmedian202001, ECmedian202002, ECmedian202003, ECmedian202004, ECmedian202010, ECmedian202011, ECmedian202012,
                             ECmedian202101, ECmedian202102, ECmedian202103, ECmedian202104)
 
-setwd("E:/ECMWFdata/pre-process/Y2019")
+#setwd("E:/ECMWFdata/pre-process/Y2018")
 #filelist = list.files(pattern="^RR_6h_q10_2018")
-filelist = list.files(pattern = "RR_6h_q10_2018.*")
-file = list.files()
+#filelist1 = list.files(pattern = "RR_6h_q10_2018.*")
+#setwd("E:/ECMWFdata/pre-process/Y2019")
+#filelist2 = list.files(pattern = "RR_6h_q10_2019.*")
+#setwd("E:/ECMWFdata/pre-process/Y2020")
+#filelist3 = list.files(pattern = "RR_6h_q10_2020.*")
+#setwd("E:/ECMWFdata/pre-process/Y2021")
+#filelist4 = list.files(pattern = "RR_6h_q10_2021.*")
+#file
 
-#temp=list.files(path="E:/ECMWFdata/pre-process/Y2019",pattern="*.txt")
-for(i in 1:length(temp)){
-file=read.table(temp[i],sep='\t')
-}
+#data1 = as.data.frame(NULL)
 
+#file1 = paste("E:/ECMWFdata/pre-process/Y2018", filelist1, sep = "/")
 
-file = paste("E:/ECMWFdata/pre-process/Y2018", filelist, sep = "/")
-for (i in 1:length(file)){
-  data[i]
-}
-
-for (i in 1:(length(filelist))) {
- data = read.table(file[i],sep = "", header = T)
+#for (i in 1:(length(filelist1))) {
+# data = read.table(file1[i],sep = "", header = T)
+# data = data[-1,]
+# data1 = rbind.data.frame(data1,data)
 #}
+
+#file1 = paste("E:/ECMWFdata/pre-process/Y2019", filelist1, sep = "/")
+
+#for (i in 1:(length(filelist1))) {
+ # data = read.table(file1[i],sep = "", header = T)
+ # data = data[-1,]
+ # data1 = rbind.data.frame(data1,data)
+#}
+
+
+
+ 
+
+
+
 ECq10_201811 = read.table("E:/ECMWFdata/pre-process/Y2018/RR_6h_q10_2018_11.txt",sep = "", header = T)
 ECq10_201811 = ECq10_201811[-1,]
 ECq10_201812 = read.table("E:/ECMWFdata/pre-process/Y2018/RR_6h_q10_2018_12.txt",sep = "", header = T)
@@ -3284,27 +3763,27 @@ ECq10_201911 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_q10_2019_11.txt"
 ECq10_201911 = ECq10_201911[-1,]
 ECq10_201912 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_q10_2019_12.txt",sep = "", header = T)
 ECq10_201912 = ECq10_201912[-1,]
-ECq10_202001 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q10_2020_Jan.txt",sep = "", header = T)
+ECq10_202001 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q10_2020_01.txt",sep = "", header = T)
 ECq10_202001 = ECq10_202001[-1,]
-ECq10_202002 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q10_2020_Feb.txt",sep = "", header = T)
+ECq10_202002 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q10_2020_02.txt",sep = "", header = T)
 ECq10_202002 = ECq10_202002[-1,]
-ECq10_202003 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q10_2020_Mar.txt",sep = "", header = T)
+ECq10_202003 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q10_2020_03.txt",sep = "", header = T)
 ECq10_202003 = ECq10_202003[-1,]
-ECq10_202004 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q10_2020_Apr.txt",sep = "", header = T)
+ECq10_202004 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q10_2020_04.txt",sep = "", header = T)
 ECq10_202004 = ECq10_202004[-1,]
-ECq10_202010 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q10_2020_Oct.txt",sep = "", header = T)
+ECq10_202010 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q10_2020_10.txt",sep = "", header = T)
 ECq10_202010 = ECq10_202010[-1,]
-ECq10_202011 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q10_2020_Nov.txt",sep = "", header = T)
+ECq10_202011 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q10_2020_11.txt",sep = "", header = T)
 ECq10_202011 = ECq10_202011[-1,]
-ECq10_202012 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q10_2020_Dec.txt",sep = "", header = T)
+ECq10_202012 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q10_2020_12.txt",sep = "", header = T)
 ECq10_202012 = ECq10_202012[-1,]
-ECq10_202101 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_q10_2021_Jan.txt",sep = "", header = T)
+ECq10_202101 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_q10_2021_01.txt",sep = "", header = T)
 ECq10_202101 = ECq10_202101[-1,]
-ECq10_202102 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_q10_2021_Feb.txt",sep = "", header = T)
+ECq10_202102 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_q10_2021_02.txt",sep = "", header = T)
 ECq10_202102 = ECq10_202102[-1,]
-ECq10_202103 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_q10_2021_Mar.txt",sep = "", header = T)
+ECq10_202103 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_q10_2021_03.txt",sep = "", header = T)
 ECq10_202103 = ECq10_202103[-1,]
-ECq10_202104 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_q10_2021_Apr.txt",sep = "", header = T)
+ECq10_202104 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_q10_2021_04.txt",sep = "", header = T)
 ECq10_202104 = ECq10_202104[-1,]
 
 
@@ -3326,27 +3805,27 @@ ECq90_201911 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_q90_2019_11.txt"
 ECq90_201911 = ECq90_201911[-1,]
 ECq90_201912 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_q90_2019_12.txt",sep = "", header = T)
 ECq90_201912 = ECq90_201912[-1,]
-ECq90_202001 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q90_2020_Jan.txt",sep = "", header = T)
+ECq90_202001 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q90_2020_01.txt",sep = "", header = T)
 ECq90_202001 = ECq90_202001[-1,]
-ECq90_202002 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q90_2020_Feb.txt",sep = "", header = T)
+ECq90_202002 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q90_2020_02.txt",sep = "", header = T)
 ECq90_202002 = ECq90_202002[-1,]
-ECq90_202003 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q90_2020_Mar.txt",sep = "", header = T)
+ECq90_202003 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q90_2020_03.txt",sep = "", header = T)
 ECq90_202003 = ECq90_202003[-1,]
-ECq90_202004 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q90_2020_Apr.txt",sep = "", header = T)
+ECq90_202004 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q90_2020_04.txt",sep = "", header = T)
 ECq90_202004 = ECq90_202004[-1,]
-ECq90_202010 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q90_2020_Oct.txt",sep = "", header = T)
+ECq90_202010 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q90_2020_10.txt",sep = "", header = T)
 ECq90_202010 = ECq90_202010[-1,]
-ECq90_202011 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q90_2020_Nov.txt",sep = "", header = T)
+ECq90_202011 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q90_2020_11.txt",sep = "", header = T)
 ECq90_202011 = ECq90_202011[-1,]
-ECq90_202012 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q90_2020_Dec.txt",sep = "", header = T)
+ECq90_202012 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_q90_2020_12.txt",sep = "", header = T)
 ECq90_202012 = ECq90_202012[-1,]
-ECq90_202101 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_q90_2021_Jan.txt",sep = "", header = T)
+ECq90_202101 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_q90_2021_01.txt",sep = "", header = T)
 ECq90_202101 = ECq90_202101[-1,]
-ECq90_202102 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_q90_2021_Feb.txt",sep = "", header = T)
+ECq90_202102 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_q90_2021_02.txt",sep = "", header = T)
 ECq90_202102 = ECq90_202102[-1,]
-ECq90_202103 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_q90_2021_Mar.txt",sep = "", header = T)
+ECq90_202103 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_q90_2021_03.txt",sep = "", header = T)
 ECq90_202103 = ECq90_202103[-1,]
-ECq90_202104 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_q90_2021_Apr.txt",sep = "", header = T)
+ECq90_202104 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_q90_2021_04.txt",sep = "", header = T)
 ECq90_202104 = ECq90_202104[-1,]
 
 
@@ -3368,72 +3847,159 @@ ECp0_201910 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_p0_2019_10.txt",s
 ECp0_201910 = ECp0_201910[-1,]
 ECp0_201911 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_p0_2019_11.txt",sep = "", header = T)
 ECp0_201911 = ECp0_201911[-1,]
-ECp0_201912 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_p0_2019_Dec.txt",sep = "", header = T)
+ECp0_201912 = read.table("E:/ECMWFdata/pre-process/Y2019/RR_6h_p0_2019_12.txt",sep = "", header = T)
 ECp0_201912 = ECp0_201912[-1,]
-ECp0_202001 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_p0_2020_Jan.txt",sep = "", header = T)
+ECp0_202001 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_p0_2020_01.txt",sep = "", header = T)
 ECp0_202001 = ECp0_202001[-1,]
-ECp0_202002 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_p0_2020_Feb.txt",sep = "", header = T)
+ECp0_202002 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_p0_2020_02.txt",sep = "", header = T)
 ECp0_202002 = ECp0_202002[-1,]
-ECp0_202003 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_p0_2020_Mar.txt",sep = "", header = T)
+ECp0_202003 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_p0_2020_03.txt",sep = "", header = T)
 ECp0_202003 = ECp0_202003[-1,]
-ECp0_202004 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_p0_2020_Apr.txt",sep = "", header = T)
+ECp0_202004 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_p0_2020_04.txt",sep = "", header = T)
 ECp0_202004 = ECp0_202004[-1,]
-ECp0_202010 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_p0_2020_Oct.txt",sep = "", header = T)
+ECp0_202010 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_p0_2020_10.txt",sep = "", header = T)
 ECp0_202010 = ECp0_202010[-1,]
-ECp0_202011 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_p0_2020_Nov.txt",sep = "", header = T)
+ECp0_202011 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_p0_2020_11.txt",sep = "", header = T)
 ECp0_202011 = ECp0_202011[-1,]
-ECp0_202012 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_p0_2020_Dec.txt",sep = "", header = T)
+ECp0_202012 = read.table("E:/ECMWFdata/pre-process/Y2020/RR_6h_p0_2020_12.txt",sep = "", header = T)
 ECp0_202012 = ECp0_202012[-1,]
-ECp0_202101 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_p0_2021_Jan.txt",sep = "", header = T)
+ECp0_202101 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_p0_2021_01.txt",sep = "", header = T)
 ECp0_202101 = ECp0_202101[-1,]
-ECp0_202102 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_p0_2021_Feb.txt",sep = "", header = T)
+ECp0_202102 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_p0_2021_02.txt",sep = "", header = T)
 ECp0_202102 = ECp0_202102[-1,]
-ECp0_202103 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_p0_2021_Mar.txt",sep = "", header = T)
+ECp0_202103 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_p0_2021_03.txt",sep = "", header = T)
 ECp0_202103 = ECp0_202103[-1,]
-ECp0_202104 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_p0_2021_Apr.txt",sep = "", header = T)
+ECp0_202104 = read.table("E:/ECMWFdata/pre-process/Y2021/RR_6h_p0_2021_04.txt",sep = "", header = T)
 ECp0_202104 = ECp0_202104[-1,]
 
-WSPDmean201811 = read.table("E:/ECMWFdata/pre-process/Y2018/WSPD_6h_mean_2018_Nov.txt",sep = "", header = T)
-WSPDmean201811 = WSPDmean201811[-1,]  
-WSPDmean201812 = read.table("E:/ECMWFdata/pre-process/Y2018/WSPD_6h_mean_2018_Dec.txt",sep = "", header = T)
-WSPDmean201812 = WSPDmean201812[-1,] 
-WSPDmean201901 = read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_mean_2019_Jan.txt",sep = "", header = T)
-WSPDmean201901 = WSPDmean201901[-1,] 
-WSPDmean201902 = read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_mean_2019_Feb.txt",sep = "", header = T)
-WSPDmean201902 = WSPDmean201902[-1,] 
-WSPDmean201903 = read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_mean_2019_Mar.txt",sep = "", header = T)
-WSPDmean201903 = WSPDmean201903[-1,] 
-WSPDmean201904 = read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_mean_2019_Apr.txt",sep = "", header = T)
-WSPDmean201904 = WSPDmean201904[-1,] 
-#WSPDmean201910 = read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_mean_2019_Oct.txt",sep = "", header = T)
-#WSPDmean201910 = WSPDmean201910[-1,] 
-#WSPDmean201911 = read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_mean_2019_Nov.txt",sep = "", header = T)
-#WSPDmean201911 = WSPDmean201911[-1,] 
-#WSPDmean201912 = read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_mean_2019_Dec.txt",sep = "", header = T)
-#WSPDmean201912 = WSPDmean201912[-1,] 
-#WSPDmean202001 = read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_mean_2020_Jan.txt",sep = "", header = T)
-#WSPDmean202001 = WSPDmean202001[-1,] 
-#WSPDmean202002 = read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_mean_2020_Feb.txt",sep = "", header = T)
-#WSPDmean202002 = WSPDmean202002[-1,] 
-#WSPDmean202003 = read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_mean_2020_Mar.txt",sep = "", header = T)
-#WSPDmean202003 = WSPDmean202003[-1,] 
-#WSPDmean202004 = read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_mean_2020_Apr.txt",sep = "", header = T)
-#WSPDmean202004 = WSPDmean202004[-1,] 
-WSPDmean202010 = read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_mean_2020_Oct.txt",sep = "", header = T)
-WSPDmean202010 = WSPDmean202010[-1,] 
-WSPDmean202011 = read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_mean_2020_Nov.txt",sep = "", header = T)
-WSPDmean202011 = WSPDmean202011[-1,] 
-WSPDmean202012 = read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_mean_2020_Dec.txt",sep = "", header = T)
-WSPDmean202012 = WSPDmean202012[-1,] 
-WSPDmean202101 = read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_mean_2021_Jan.txt",sep = "", header = T)
-WSPDmean202101 = WSPDmean202101[-1,] 
-WSPDmean202102 = read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_mean_2021_Feb.txt",sep = "", header = T)
-WSPDmean202102 = WSPDmean202102[-1,] 
-WSPDmean202103 = read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_mean_2021_Mar.txt",sep = "", header = T)
-WSPDmean202103 = WSPDmean202103[-1,] 
-WSPDmean202104 = read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_mean_2021_Apr.txt",sep = "", header = T)
-WSPDmean202104 = WSPDmean202104[-1,] 
 
+
+
+ECq10 = rbind.data.frame(ECq10_201811,ECq10_201812, ECq10_201901, ECq10_201902, ECq10_201903, ECq10_201904, ECq10_201910, ECq10_201911,
+                         ECq10_201912, ECq10_202001, ECq10_202002, ECq10_202003, ECq10_202004, ECq10_202010, ECq10_202011, ECq10_202012,
+                         ECq10_202101, ECq10_202102, ECq10_202103, ECq10_202104)
+#ECq10 = ECq10[-(66551:73810),]
+#ECq10 = ECq10[-(159237:166496),]
+
+
+ECq90 = rbind.data.frame(ECq90_201811,ECq90_201812, ECq90_201901, ECq90_201902, ECq90_201903, ECq90_201904, ECq90_201910, ECq90_201911,
+                         ECq90_201912, ECq90_202001, ECq90_202002, ECq90_202003, ECq90_202004, ECq90_202010, ECq90_202011, ECq90_202012,
+                         ECq90_202101, ECq90_202102, ECq90_202103, ECq90_202104)
+
+#ECq90 = ECq90[-(66551:73810),]
+#ECq90 = ECq90[-(159237:166496),]
+
+
+ECp0 = rbind.data.frame(ECp0_201811,ECp0_201812, ECp0_201901, ECp0_201902, ECp0_201903, ECp0_201904, ECp0_201910, ECp0_201911,
+                        ECp0_201912, ECp0_202001, ECp0_202002, ECp0_202003, ECp0_202004, ECp0_202010, ECp0_202011, ECp0_202012,
+                        ECp0_202101, ECp0_202102, ECp0_202103, ECp0_202104)
+#ECp0 = ECp0[-(66551:73810),]
+#ECp0 = ECp0[-(159237:166496),]
+
+
+rm(ECmean201811,ECmean201812,ECmean201901,ECmean201902,ECmean201903,ECmean201904,ECmean201910,ECmean201911,
+   ECmean201912,ECmean202001,ECmean202002,ECmean202003,ECmean202004,ECmean202010,ECmean202011,ECmean202012,
+   ECmean202101,ECmean202102,ECmean202103,ECmean202104,ECsd201811,ECsd201812,ECsd201901,ECsd201902,ECsd201903,
+   ECsd201904,ECsd201910,ECsd201911,ECsd201912,ECsd202001,ECsd202002,ECsd202003,ECsd202004,ECsd202010,
+   ECsd202011,ECsd202012,ECsd202101,ECsd202102,ECsd202103,ECsd202104)  
+rm(ECmedian201811,ECmedian201812, ECmedian201901, ECmedian201902, ECmedian201903, ECmedian201904, ECmedian201910, ECmedian201911,
+   ECmedian201912, ECmedian202001, ECmedian202002, ECmedian202003, ECmedian202004, ECmedian202010, ECmedian202011, ECmedian202012,
+   ECmedian202101, ECmedian202102, ECmedian202103, ECmedian202104,ECq10_201811,ECq10_201812, ECq10_201901, ECq10_201902, ECq10_201903, ECq10_201904, ECq10_201910, ECq10_201911,
+   ECq10_201912, ECq10_202001, ECq10_202002, ECq10_202003, ECq10_202004, ECq10_202010, ECq10_202011, ECq10_202012,
+   ECq10_202101, ECq10_202102, ECq10_202103, ECq10_202104,ECq90_201811,ECq90_201812, ECq90_201901, ECq90_201902, ECq90_201903, ECq90_201904, ECq90_201910, ECq90_201911,
+   ECq90_201912, ECq90_202001, ECq90_202002, ECq90_202003, ECq90_202004, ECq90_202010, ECq90_202011, ECq90_202012,
+   ECq90_202101, ECq90_202102, ECq90_202103, ECq90_202104,ECp0_201811,ECp0_201812, ECp0_201901, ECp0_201902, ECp0_201903, ECp0_201904, ECp0_201910, ECp0_201911,
+   ECp0_201912, ECp0_202001, ECp0_202002, ECp0_202003, ECp0_202004, ECp0_202010, ECp0_202011, ECp0_202012,
+   ECp0_202101, ECp0_202102, ECp0_202103, ECp0_202104)
+
+
+WSPDmean = rbind.data.frame(read.table("E:/ECMWFdata/pre-process/Y2018/WSPD_6h_mean_2018_11.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2018/WSPD_6h_mean_2018_12.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_mean_2019_01.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_mean_2019_02.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_mean_2019_03.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_mean_2019_04.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_mean_2020_10.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_mean_2020_11.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_mean_2020_12.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_mean_2021_01.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_mean_2021_02.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_mean_2021_03.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_mean_2021_04.txt",sep = "", header = T)[-1,])
+
+
+
+WSPDmedian = rbind.data.frame(read.table("E:/ECMWFdata/pre-process/Y2018/WSPD_6h_median_2018_11.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2018/WSPD_6h_median_2018_12.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_median_2019_01.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_median_2019_02.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_median_2019_03.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_median_2019_04.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_median_2020_10.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_median_2020_11.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_median_2020_12.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_median_2021_01.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_median_2021_02.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_median_2021_03.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_median_2021_04.txt",sep = "", header = T)[-1,])
+                              
+                              
+WSPDsd = rbind.data.frame(read.table("E:/ECMWFdata/pre-process/Y2018/WSPD_6h_sd_2018_11.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2018/WSPD_6h_sd_2018_12.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_sd_2019_01.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_sd_2019_02.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_sd_2019_03.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_sd_2019_04.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_sd_2020_10.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_sd_2020_11.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_sd_2020_12.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_sd_2021_01.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_sd_2021_02.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_sd_2021_03.txt",sep = "", header = T)[-1,],
+                              read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_sd_2021_04.txt",sep = "", header = T)[-1,])
+
+                              
+WSPDq10 = rbind.data.frame(read.table("E:/ECMWFdata/pre-process/Y2018/WSPD_6h_q10_2018_11.txt",sep = "", header = T)[-1,],
+                          read.table("E:/ECMWFdata/pre-process/Y2018/WSPD_6h_q10_2018_12.txt",sep = "", header = T)[-1,],
+                          read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_q10_2019_01.txt",sep = "", header = T)[-1,],
+                          read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_q10_2019_02.txt",sep = "", header = T)[-1,],
+                          read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_q10_2019_03.txt",sep = "", header = T)[-1,],
+                          read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_q10_2019_04.txt",sep = "", header = T)[-1,],
+                          read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_q10_2020_10.txt",sep = "", header = T)[-1,],
+                          read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_q10_2020_11.txt",sep = "", header = T)[-1,],
+                          read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_q10_2020_12.txt",sep = "", header = T)[-1,],
+                          read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_q10_2021_01.txt",sep = "", header = T)[-1,],
+                          read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_q10_2021_02.txt",sep = "", header = T)[-1,],
+                          read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_q10_2021_03.txt",sep = "", header = T)[-1,],
+                          read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_q10_2021_04.txt",sep = "", header = T)[-1,])
+
+WSPDq25 = rbind.data.frame(read.table("E:/ECMWFdata/pre-process/Y2018/WSPD_6h_q25_2018_11.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2018/WSPD_6h_q25_2018_12.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_q25_2019_01.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_a25_2019_02.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_q25_2019_03.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_q25_2019_04.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_q25_2020_10.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_q25_2020_11.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_q25_2020_12.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_q25_2021_01.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_q25_2021_02.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_q25_2021_03.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_q25_2021_04.txt",sep = "", header = T)[-1,])
+
+WSPDq75 = rbind.data.frame(read.table("E:/ECMWFdata/pre-process/Y2018/WSPD_6h_q75_2018_11.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2018/WSPD_6h_q75_2018_12.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_q75_2019_01.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_q75_2019_02.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_q75_2019_03.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2019/WSPD_6h_q75_2019_04.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_q75_2020_10.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_q75_2020_11.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2020/WSPD_6h_q75_2020_12.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_q75_2021_01.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_q75_2021_02.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_q75_2021_03.txt",sep = "", header = T)[-1,],
+                           read.table("E:/ECMWFdata/pre-process/Y2021/WSPD_6h_q75_2021_04.txt",sep = "", header = T)[-1,])
 
 
 #Rdata201811 =  read.table("E:/RadarData/radar_output/2018_11.txt",sep = "", header = T)
@@ -3443,8 +4009,8 @@ Rdata = cbind.data.frame(read.table("E:/output/radar_output/2018_11_9km_avg.txt"
                              read.table("E:/output/radar_output/2019_02_9km_avg.txt",sep = "", header = T),
                              read.table("E:/output/radar_output/2019_03_9km_avg.txt",sep = "", header = T),
                              read.table("E:/output/radar_output/2019_04_9km_avg.txt",sep = "", header = T),
-                           read.table("E:/output/radar_output/2019_10_9km_avg.txt",sep = "", header = T),
-                            read.table("E:/output/radar_output/2019_11_9km_avg.txt",sep = "", header = T),
+                             read.table("E:/output/radar_output/2019_10_9km_avg.txt",sep = "", header = T),
+                             read.table("E:/output/radar_output/2019_11_9km_avg.txt",sep = "", header = T),
                              read.table("E:/output/radar_output/2019_12_9km_avg.txt",sep = "", header = T),
                              read.table("E:/output/radar_output/2020_01_9km_avg.txt",sep = "", header = T),
                              read.table("E:/output/radar_output/2020_02_9km_avg.txt",sep = "", header = T),
@@ -3485,43 +4051,6 @@ Rdata = cbind.data.frame(RmatchID,Rdata)
 
 
 
-
-ECq10 = rbind.data.frame(ECq10_201811,ECq10_201812, ECq10_201901, ECq10_201902, ECq10_201903, ECq10_201904, ECq10_201910, ECq10_201911,
-                            ECq10_201912, ECq10_202001, ECq10_202002, ECq10_202003, ECq10_202004, ECq10_202010, ECq10_202011, ECq10_202012,
-                            ECq10_202101, ECq10_202102, ECq10_202103, ECq10_202104)
-#ECq10 = ECq10[-(66551:73810),]
-#ECq10 = ECq10[-(159237:166496),]
-
-
-ECq90 = rbind.data.frame(ECq90_201811,ECq90_201812, ECq90_201901, ECq90_201902, ECq90_201903, ECq90_201904, ECq90_201910, ECq90_201911,
-                         ECq90_201912, ECq90_202001, ECq90_202002, ECq90_202003, ECq90_202004, ECq90_202010, ECq90_202011, ECq90_202012,
-                         ECq90_202101, ECq90_202102, ECq90_202103, ECq90_202104)
-
-#ECq90 = ECq90[-(66551:73810),]
-#ECq90 = ECq90[-(159237:166496),]
-
-
-ECp0 = rbind.data.frame(ECp0_201811,ECp0_201812, ECp0_201901, ECp0_201902, ECp0_201903, ECp0_201904, ECp0_201910, ECp0_201911,
-                         ECp0_201912, ECp0_202001, ECp0_202002, ECp0_202003, ECp0_202004, ECp0_202010, ECp0_202011, ECp0_202012,
-                         ECp0_202101, ECp0_202102, ECp0_202103, ECp0_202104)
-#ECp0 = ECp0[-(66551:73810),]
-#ECp0 = ECp0[-(159237:166496),]
-
-
-rm(ECmean201811,ECmean201812,ECmean201901,ECmean201902,ECmean201903,ECmean201904,ECmean201910,ECmean201911,
-   ECmean201912,ECmean202001,ECmean202002,ECmean202003,ECmean202004,ECmean202010,ECmean202011,ECmean202012,
-   ECmean202101,ECmean202102,ECmean202103,ECmean202104,ECsd201811,ECsd201812,ECsd201901,ECsd201902,ECsd201903,
-   ECsd201904,ECsd201910,ECsd201911,ECsd201912,ECsd202001,ECsd202002,ECsd202003,ECsd202004,ECsd202010,
-   ECsd202011,ECsd202012,ECsd202101,ECsd202102,ECsd202103,ECsd202104)  
-rm(ECmedian201811,ECmedian201812, ECmedian201901, ECmedian201902, ECmedian201903, ECmedian201904, ECmedian201910, ECmedian201911,
-   ECmedian201912, ECmedian202001, ECmedian202002, ECmedian202003, ECmedian202004, ECmedian202010, ECmedian202011, ECmedian202012,
-   ECmedian202101, ECmedian202102, ECmedian202103, ECmedian202104,ECq10_201811,ECq10_201812, ECq10_201901, ECq10_201902, ECq10_201903, ECq10_201904, ECq10_201910, ECq10_201911,
-   ECq10_201912, ECq10_202001, ECq10_202002, ECq10_202003, ECq10_202004, ECq10_202010, ECq10_202011, ECq10_202012,
-   ECq10_202101, ECq10_202102, ECq10_202103, ECq10_202104,ECq90_201811,ECq90_201812, ECq90_201901, ECq90_201902, ECq90_201903, ECq90_201904, ECq90_201910, ECq90_201911,
-   ECq90_201912, ECq90_202001, ECq90_202002, ECq90_202003, ECq90_202004, ECq90_202010, ECq90_202011, ECq90_202012,
-   ECq90_202101, ECq90_202102, ECq90_202103, ECq90_202104,ECp0_201811,ECp0_201812, ECp0_201901, ECp0_201902, ECp0_201903, ECp0_201904, ECp0_201910, ECp0_201911,
-   ECp0_201912, ECp0_202001, ECp0_202002, ECp0_202003, ECp0_202004, ECp0_202010, ECp0_202011, ECp0_202012,
-   ECp0_202101, ECp0_202102, ECp0_202103, ECp0_202104)
 
 
 ECmean$grid = as.numeric(substr(ECmean$second_category,12,15))
@@ -3596,23 +4125,23 @@ ECsub = ECmean[,61:64]
 Rsub = Rdata[,1:2]
 ECmatch = left_join(ECsub,Rsub,by = c("dftime"="Rtime"))
 ECmean = cbind.data.frame(ECmean,ECmatch$RmatchID)
-ECmean = ECmean[which(ECmean$`ECmatch$RmatchID` <665 | ECmean$`ECmatch$RmatchID` >723 & ECmean$`ECmatch$RmatchID`<1517
-                      | ECmean$`ECmatch$RmatchID`>1575 & ECmean$`ECmatch$RmatchID`<2365 ),]
+ECmean = ECmean[which(ECmean$`ECmatch$RmatchID` <665 | ECmean$`ECmatch$RmatchID` >783 & ECmean$`ECmatch$RmatchID`<1517
+                      | ECmean$`ECmatch$RmatchID`>1635 & ECmean$`ECmatch$RmatchID`<2365 ),]
 ECsd = cbind.data.frame(ECsd,ECmatch$RmatchID)
-ECsd = ECsd[which(ECsd$`ECmatch$RmatchID` <665 | ECsd$`ECmatch$RmatchID` >723 & ECsd$`ECmatch$RmatchID`<1517
-                      | ECsd$`ECmatch$RmatchID`>1575 & ECsd$`ECmatch$RmatchID`<2365 ),]
+ECsd = ECsd[which(ECsd$`ECmatch$RmatchID` <665 | ECsd$`ECmatch$RmatchID` >783  & ECsd$`ECmatch$RmatchID`<1517
+                      | ECsd$`ECmatch$RmatchID`>1635 & ECsd$`ECmatch$RmatchID`<2365 ),]
 ECmedian = cbind.data.frame(ECmedian,ECmatch$RmatchID)
-ECmedian = ECmedian[which(ECmedian$`ECmatch$RmatchID` <665 | ECmedian$`ECmatch$RmatchID` >723 & ECmedian$`ECmatch$RmatchID`<1517
-                  | ECmedian$`ECmatch$RmatchID`>1575 & ECmedian$`ECmatch$RmatchID`<2365 ),]
+ECmedian = ECmedian[which(ECmedian$`ECmatch$RmatchID` <665 | ECmedian$`ECmatch$RmatchID` >783 & ECmedian$`ECmatch$RmatchID`<1517
+                  | ECmedian$`ECmatch$RmatchID`>1635 & ECmedian$`ECmatch$RmatchID`<2365 ),]
 ECq10 = cbind.data.frame(ECq10,ECmatch$RmatchID)
-ECq10 = ECq10[which(ECq10$`ECmatch$RmatchID` <665 | ECq10$`ECmatch$RmatchID` >723 & ECq10$`ECmatch$RmatchID`<1517
-                          | ECq10$`ECmatch$RmatchID`>1575 & ECq10$`ECmatch$RmatchID`<2365 ),]
+ECq10 = ECq10[which(ECq10$`ECmatch$RmatchID` <665 | ECq10$`ECmatch$RmatchID` >783  & ECq10$`ECmatch$RmatchID`<1517
+                          | ECq10$`ECmatch$RmatchID`>1635 & ECq10$`ECmatch$RmatchID`<2365 ),]
 ECq90 = cbind.data.frame(ECq90,ECmatch$RmatchID)
-ECq90 = ECq90[which(ECq90$`ECmatch$RmatchID` <665 | ECq90$`ECmatch$RmatchID` >723 & ECq90$`ECmatch$RmatchID`<1517
-                    | ECq90$`ECmatch$RmatchID`>1575 & ECq90$`ECmatch$RmatchID`<2365 ),]
+ECq90 = ECq90[which(ECq90$`ECmatch$RmatchID` <665 | ECq90$`ECmatch$RmatchID` >783  & ECq90$`ECmatch$RmatchID`<1517
+                    | ECq90$`ECmatch$RmatchID`>1635 & ECq90$`ECmatch$RmatchID`<2365 ),]
 ECp0 = cbind.data.frame(ECp0,ECmatch$RmatchID)
-ECp0 = ECp0[which(ECp0$`ECmatch$RmatchID` <665 | ECp0$`ECmatch$RmatchID` >723 & ECp0$`ECmatch$RmatchID`<1517
-                    | ECp0$`ECmatch$RmatchID`>1575 & ECp0$`ECmatch$RmatchID`<2365 ),]
+ECp0 = ECp0[which(ECp0$`ECmatch$RmatchID` <665 | ECp0$`ECmatch$RmatchID` >783  & ECp0$`ECmatch$RmatchID`<1517
+                    | ECp0$`ECmatch$RmatchID`>1635 & ECp0$`ECmatch$RmatchID`<2365 ),]
 
 
 
@@ -3674,6 +4203,7 @@ ECp0 = ECp0[which(ECp0$`ECmatch$RmatchID` <665 | ECp0$`ECmatch$RmatchID` >723 & 
    for (i in test){
 #  subdata = Rdata[which(Rdata$Rtime == i+hours(24)),]   
     subdata = Rdata[which(Rdata$RmatchID == i+1),]
+    
 #    rID = upscal_match[,1]
 #    dfID = upscal_match[,2]   
 #    subdata = rbind.data.frame(rID,dfID,subdata)   
@@ -3728,34 +4258,34 @@ ECp0 = ECp0[which(ECp0$`ECmatch$RmatchID` <665 | ECp0$`ECmatch$RmatchID` >723 & 
 
 EC4meanfinal1 = EC4meanfinal[,-1]
 EC4meanfinal1 = as.matrix(EC4meanfinal1)
-dim(EC4meanfinal1) <- c(599*1015,1)
+dim(EC4meanfinal1) <- c(599*955,1)
 EC4sdfinal1 = EC4sdfinal[,-1]
 EC4sdfinal1 = as.matrix(EC4sdfinal1)
-dim(EC4sdfinal1) <- c(599*1015,1)
+dim(EC4sdfinal1) <- c(599*955,1)
 EC4medianfinal1 = EC4medianfinal[,-1]
 EC4medianfinal1 = as.matrix(EC4medianfinal1)
-dim(EC4medianfinal1) <- c(599*1015,1)
+dim(EC4medianfinal1) <- c(599*955,1)
 EC4q10final1 = EC4q10final[,-1]
 EC4q10final1 = as.matrix(EC4q10final1)
-dim(EC4q10final1) <- c(599*1015,1)
+dim(EC4q10final1) <- c(599*955,1)
 EC4q90final1 = EC4q90final[,-1]
 EC4q90final1 = as.matrix(EC4q90final1)
-dim(EC4q90final1) <- c(599*1015,1)
+dim(EC4q90final1) <- c(599*955,1)
 EC4p0final1 = EC4p0final[,-1]
 EC4p0final1 = as.matrix(EC4p0final1)
-dim(EC4p0final1) <- c(599*1015,1)
+dim(EC4p0final1) <- c(599*955,1)
 R4final1 = R4final[,-1]
 R4final1 = as.matrix(R4final1)
-dim(R4final1) <- c(599*1015,1)
+dim(R4final1) <- c(599*955,1)
 EC4time1 = EC4time[,-1]
 EC4time1 = as.matrix(EC4time1)
-dim(EC4time1) <- c(599*1015,1)
+dim(EC4time1) <- c(599*955,1)
 EC4ID1 = EC4ID[,-1]
 EC4ID1 = as.matrix(EC4ID1)
-dim(EC4ID1) <- c(599*1015,1)
+dim(EC4ID1) <- c(599*955,1)
 R4ID1 = R4ID[,-1]
 R4ID1 = as.matrix(R4ID1)
-dim(R4ID1) <- c(599*1015,1)
+dim(R4ID1) <- c(599*955,1)
 
 
 final = cbind.data.frame(EC4meanfinal1,EC4sdfinal1,EC4medianfinal1,EC4q10final1,EC4q90final1,EC4p0final1,R4final1,EC4time1,EC4ID1,R4ID1)
@@ -3777,31 +4307,68 @@ final$EC4q90final1 = as.numeric(final$EC4q90final1)
 final$EC4p0final1 = as.numeric(final$EC4p0final1)
 
 final$R4final1 = as.numeric(final$R4final1)
+final = na.omit(final)
+
 
 library(gamlss)
 curt <- function(value) return(value^(1.0/3))
 
 
-m1 = gamlss(formula=R4final1 ~ EC4meanfinal1+EC4sdfinal1+EC4medianfinal1+EC4q10final1+EC4q90final1+EC4p0final1,
-                        sigma.formula = ~EC4meanfinal1+EC4sdfinal1+EC4medianfinal1+EC4q10final1+EC4q90final1+EC4p0final1,
-                         nu.formula=~EC4meanfinal1+EC4sdfinal1+EC4medianfinal1+EC4q10final1+EC4q90final1+EC4p0final1,
-                         family = ZAGA, data = na.omit(final))
 
 
 
 
+mod0<-gamlss(R4final1~1, data=final, family=ZAGA)
 
-mod0<-gamlss(R4final1~1, data=na.omit(final), family=ZAGA)
-mod1 = stepGAICAll.A(mod0, scope=list(lower=~1,upper=~EC4meanfinal1+EC4sdfinal1+EC4medianfinal1), 
-                     sigma.scope=list(lower=~1,upper=~EC4meanfinal1+EC4sdfinal1+EC4medianfinal1), 
-                     nu.scope=list(lower=~1,upper=~EC4meanfinal1+EC4sdfinal1+EC4medianfinal1)) 
+mod1 = stepGAICAll.A(mod0, scope=list(lower=~1,upper=~EC4meanfinal1+EC4sdfinal1+EC4medianfinal1+EC4q10final1+EC4q90final+EC4p0final1), 
+                     sigma.scope=list(lower=~1,upper=~EC4meanfinal1+EC4sdfinal1+EC4medianfinal1+EC4q10final1+EC4q90final+EC4p0final1), 
+                     nu.scope=list(lower=~1,upper=~EC4meanfinal1+EC4sdfinal1+EC4medianfinal1+EC4q10final1+EC4q90final+EC4p0final1),
+                     #direction = "forward",
+                     steps = 2) 
+
+saveRDS(object = mod1, file = "toy model for RR.rds")
+mod1 = readRDS(file = "toy model for RR.rds")
 
 
-mod1 = stepGAICAll.B(mod0, scope=list(lower=~1,upper=~EC4meanfinal1+EC4sdfinal1+EC4medianfinal1+EC4q10final1+EC4q90final1+EC4p0final1), 
+
+prd  <- predictAll(mod1,newdata=final[1:20,])
+prob <- 1:51 / 52
+new_data = as.data.frame(matrix(NA,nrow = 51, ncol = 20))
+for (i in 1:20){
+new_data[,i]=sapply(prob, function(u) qZAGA(u, mu=prd$mu[i], sigma=prd$sigma[i], nu=prd$nu[i]))
+}
+
+
+
+
+CRPS; 
+
+
+qts  <- switch(env$prm, T2m=sapply(prob, function(u) qNO(u, mu=prd$mu, sigma=prd$sigma)),
+               S10m=sapply(prob, function(u) qBCT(u, mu=prd$mu, sigma=prd$sigma, nu=prd$nu, tau=prd$tau)),
+               AccPcp1h=sapply(prob, function(u) qZAGA(u, mu=prd$mu, sigma=prd$sigma, nu=prd$nu)))
+cat("Range of predicted quantiles:", range(qts), "\n")
+
+
+mod1 = stepGAICAll.A(mod0, scope=list(lower=~1,upper=~EC4meanfinal1+EC4sdfinal1+EC4medianfinal1+EC4q10final1+EC4q90final1+EC4p0final1), 
                      sigma.scope=list(lower=~1,upper=~EC4meanfinal1+EC4sdfinal1+EC4medianfinal1+EC4q10final1+EC4q90final1+EC4p0final1), 
                      nu.scope=list(lower=~1,upper=~EC4meanfinal1+EC4sdfinal1+EC4medianfinal1+EC4q10final1+EC4q90final1+EC4p0final1)) 
 
 
+#Mu Coefficients:
+#  (Intercept)   EC4q90final1    EC4p0final1    EC4sdfinal1  EC4meanfinal1   EC4q10final1  
+#-3.30495        0.14569        2.85005        0.08243        0.23427       -0.08749  
+#Sigma Coefficients:
+#  (Intercept)     EC4q90final1      EC4p0final1     EC4q10final1      EC4sdfinal1  EC4medianfinal1    EC4meanfinal1  
+#0.58493         -0.08516         -0.17233         -0.01741          0.10119          0.08296         -0.11659  
+#Nu Coefficients:
+#  (Intercept)     EC4q90final1      EC4p0final1      EC4sdfinal1     EC4q10final1  EC4medianfinal1    EC4meanfinal1  
+#2.4123          -0.4389          -2.0214          -3.7861          -1.8932           0.6710           0.4136 
+
+qZAGA(0.975, mu = -3.30495+0.14569*14.7+2.85005+0.08243*1.37775+0.23427*13.23137-0.08749*11.4
+      , sigma = 0.58493-0.08516*14.7-0.17233-0.01741*11.4+0.10119*1.37775+0.08296*13.2-0.11659*13.23137
+      , nu = 2.4123-0.4389*14.7-2.0214-3.7861*1.37775-1.8932*11.4+0.671*13.2+0.4136*13.23137, lower.tail = T, 
+      log.p = F)
 
 
 
@@ -3811,8 +4378,7 @@ mod1 = stepGAICAll.B(mod0, scope=list(lower=~1,upper=~EC4meanfinal1+EC4sdfinal1+
 #for checking 
 ECtest<-read.delim("E:/ECMWFdata/ECME_2019/Oct/ECME_NNL_2019100112/ECME_NNL_201910011200_NL096_LC",sep = "", header = F) #读取xlsx文件
 
-qZAGA(0.9, mu = 0.624914, sigma = 0.4173, nu = 0.3026, lower.tail = TRUE, 
-      log.p = FALSE)
+
 #####remove the boundary############################################################################
 rvi_table = read.delim("E:/KNMI_DATA/matchdata.txt", sep = "\t")
 ra = raster("D:/ITC/KNMI/radar_data/09-20211013T195924Z-001/09/RAD_NL25_RAC_MFBS_01H_202009010200.nc")
@@ -4105,8 +4671,13 @@ write.table(upscal_match, "upscal_match.txt", sep = "\t", col.names = T, row.nam
   }       
 
       
-      
-     
+#added variables
+13241
+14034
+
+20010
+20257
+00182   
       
       
     #WSPD (m/s)
@@ -4160,12 +4731,51 @@ write.table(upscal_match, "upscal_match.txt", sep = "\t", col.names = T, row.nam
     data_CC = data[638:690,]
     data_CC[,48:83]=trunc(data_CC[,48:83]/1000000)
     data_CC[2,64]=data_CC[2,64]/10^234
+    data_CC = as.data.frame(lapply(data_CC,as.numeric))
     CC_6hstep = data_CC[,c(2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,49:84)]
- 
-    avg_WDIR = mean()
+    #conv precip_cum 
+    data_conRRcum = data[691:743,]
+    data_conRRcum[,48:83]=trunc(data_conRRcum[,48:83]/1000000)
+    data_conRRcum[2,64]=data_conRRcum[2,64]/10^234
+    data_conRRcum = as.data.frame(lapply(data_conRRcum,as.numeric))
+    data_conRRcum[2:53,]=data_conRRcum[2:53,]/10
+    conRRcum_6hstep = data_conRRcum[,c(2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,49:84)]
+    #conv precip (mm)
+    conRR_6hstep = conRRcum_6hstep[,1:(ncol(conRRcum_6hstep)-1)]
+    conRR_6hstep = cbind(0,conRR_6hstep)
+    conRRcum_6hstep = as.data.frame(lapply(conRRcum_6hstep,as.numeric))
+    conRR_6hstep = as.data.frame(lapply(conRR_6hstep,as.numeric))
+    conRR_6hstep = conRRcum_6hstep-conRR_6hstep
+    #CAPE
+    data_cape = data[585:637,]
+    data_cape[,48:83]=trunc(data_cape[,48:83]/1000000)
+    data_cape[2,64]=data_cape[2,64]/10^234
+    data_cape = as.data.frame(lapply(data_cape,as.numeric))
+    cape_6hstep = data_cape[,c(2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,49:84)]
+    #sunshine_duration (the data has some problems)
+    #CAPE shear
+    data_capeS = data[849:901,]  #For Y2018 and Y2019 Jan, Feb, Mar, Apr, Oct(1-5)
     
+    data_capeS = data[797:849,]  #Start from Oct 6th
     
+    data_capeS[,48:83]=trunc(data_capeS[,48:83]/1000000)
+    data_capeS[2,64]=data_capeS[2,64]/10^234
+    data_capeS = as.data.frame(lapply(data_capeS,as.numeric))
+    capeS_6hstep = data_capeS[,c(2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,49:84)]
+    #evaporation_ cum
+    data_evacum = data[955:1007,] #For Y2018 and Y2019 Jan, Feb, Mar, Apr, Oct(1-5)
+    data_evacum = data[903:955,] #Start from Oct 6th
     
+    data_evacum[,48:83]=trunc(data_evacum[,48:83]/1000000)
+    data_evacum[2,64]=data_evacum[2,64]/10^234
+    data_evacum = as.data.frame(lapply(data_evacum,as.numeric))
+    evacum_6hstep = data_evacum[,c(2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,49:84)]
+    #evaporation (mm)
+    eva_6hstep = evacum_6hstep[,1:(ncol(evacum_6hstep)-1)]
+    eva_6hstep = cbind(0,eva_6hstep)
+    evacum_6hstep = as.data.frame(lapply(evacum_6hstep,as.numeric))
+    eva_6hstep = as.data.frame(lapply(eva_6hstep,as.numeric))
+    eva_6hstep = evacum_6hstep-eva_6hstep   
     
     
 
