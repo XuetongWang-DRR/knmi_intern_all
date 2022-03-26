@@ -124,15 +124,57 @@ na.rm = T
 ggplot(r %>% mutate(celln = 1:nrow(r))) + geom_point(aes(x = V3, y = V2, col = celln))
 head(as.data.frame(ra, xy=TRUE))
 
-p <- ggplot(final,aes(x=(EC4meanfinal1)^(1/3), y=(R4final1)^(1/3)))+geom_point(size = 1, shape = 21)+xlab("p0")+ylab("Observation")+
-    xlim(0, 3) + ylim(0,3) + ggtitle("Observation versus mean for 60 hours forecast time (cube root)") 
+p <- ggplot(ALL_5_3,aes(x=x, y=ALL_5_3_500_bs))+geom_point(size = 1, shape = 21)+xlab("p0")+ylab("Observation")+
+    xlim(0,15) + ylim(0,0.5) + ggtitle("Observation versus mean for 60 hours forecast time (cube root)") 
 p <- ggplot(final,aes(x=EC4meanfinal1, y=R4final1))+geom_point(size = 1, shape = 21)+xlab("p0")+ylab("Observation")+
   xlim(0, 20) + ylim(0,20) + ggtitle("Observation versus mean for 60 hours forecast time") 
 
+
+set.seed(1234)
+threshold <-  c(0.05,0.5,1,3,5,10,15)
+type <- rep(c('3var_bs','5var_bs','default_bs'),each = 7)
+
+value <- c(0.1025,0.0782,0.0661,0.0356,0.0199,0.00389,0.000279,0.1028,0.0782
+           ,0.0662,0.0356,0.0198,0.00392,0.000278,0.1058,0.0798,0.0677,0.03600,0.02002,0.003858,0.0002769)
+df <- data.frame(lead_time = lead_time, type = type, value = value)
+ggplot(data = df, mapping = aes(x = lead_time, y = value, colour = type)) + geom_line()+xlab("lead time (h)")+ylab("crps")+
+  ggtitle("Continuous ranked probability score of emos (ZAGA) and qrf with different lead time") 
+
+
+type <- rep(c('3var_ss','5var_ss','default_ss'),each = 7)
+value <- c(0.499,0.474,0.445,0.366,0.267,0.0983,0.003901,0.498,0.474,0.444,0.365,0.2678,0.0905,0.008611,0.483,
+           0.463,0.432,0.358,0.261,0.1056,0.01185)
+
+df <- data.frame(threshold = threshold, type = type, value = value)
+ggplot(data = df, mapping = aes(x = lead_time, y = value, colour = type)) + geom_bar(stat = 'identity')
+
+
+
+x <- rep(c(24,48,72,96), each = 3)
+y <- rep(c('raw','zaga','qrf'),times = 4)
+set.seed(1234)
+bs <- c(0.1025,0.1028,0.1058,0.07819895,0.07822975,0.07981754,0.06609,0.0662467,0.0677281,0.035556,0.035612,
+       0.036003,0.019851,0.01983735,0.02002396,0.003889,0.00392298,0.003857852,0.000279,0.00027778,0.0002769)
+#z <- c()
+df <- data.frame(x = x, y=y, value1=value1)
+#不作任何条形宽度和条形距离的调整
+ggplot(data = df, mapping = aes(x = factor(x), y = value1, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("crps")+
+  ggtitle("Continuous ranked probability score of emos (ZAGA) and qrf with different lead time") 
+
+
+ss <- c(0.4990924,0.4976741,0.4826699,0.4742184,0.4740113,0.4633356,0.4453593,0.4440599,0.4316278,0.3656134,
+        0.3646171,0.3578695,0.2672695,0.2677825,0.2608949,0.09827222,0.09048656,0.1055856,0.003901127,0.008611494,0.01184584)
+df <- data.frame(x = x, y=y,ss=ss)
+#不作任何条形宽度和条形距离的调整
+ggplot(data = df, mapping = aes(x = factor(x), y = ss, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("threshold")+
+  ggtitle("Comparasion of ss for qrf (48h)") 
+
+
+
 #4.写入/读取mod格式文件
-saveRDS(object = mod1, file = "24h_forecast_3rd_year_4step.rds")
+saveRDS(object = mod1, file = "24h_forecast_3rd_year_2step.rds")
 setwd("E:/output")
-mod1 = readRDS(file = "24h_forecast_3rd_year.rds")
+mod1 = readRDS(file = "24h_forecast_3rd_year_3step.rds")
 ####check with radar data-------------------------------------------------------------------------------
 
 
@@ -189,12 +231,12 @@ b$grid = rep(c(1:242), each = 40)
 library(ncdf4)
 library(raster)
 rb = nc_open("D:/ITC/KNMI/radar_data/09-20211013T195924Z-001/09/RAD_NL25_RAC_MFBS_01H_202009010200.nc")
-ra = raster("E:/RadarData/2018/12/RAD_NL25_RAC_MFBS_01H_201812020700.nc")+
-  raster("E:/RadarData/2018/12/RAD_NL25_RAC_MFBS_01H_201812020800.nc")+
-  raster("E:/RadarData/2018/12/RAD_NL25_RAC_MFBS_01H_201812020900.nc")+
-  raster("E:/RadarData/2018/12/RAD_NL25_RAC_MFBS_01H_201812021000.nc")+
-  raster("E:/RadarData/2018/12/RAD_NL25_RAC_MFBS_01H_201812021100.nc")+
-  raster("E:/RadarData/2018/12/RAD_NL25_RAC_MFBS_01H_201812021200.nc")
+ra = raster("E:/RadarData/2021/02/RAD_NL25_RAC_MFBS_01H_202102030700.nc")+
+  raster("E:/RadarData/2021/02/RAD_NL25_RAC_MFBS_01H_202102030800.nc")+
+  raster("E:/RadarData/2021/02/RAD_NL25_RAC_MFBS_01H_202102030900.nc")+
+  raster("E:/RadarData/2021/02/RAD_NL25_RAC_MFBS_01H_202102031000.nc")+
+  raster("E:/RadarData/2021/02/RAD_NL25_RAC_MFBS_01H_202102031100.nc")+
+  raster("E:/RadarData/2021/02/RAD_NL25_RAC_MFBS_01H_202102031200.nc")
 
 plot(ra, main = "Radar Precipitation for 6 hours (mm)", xlim = c(200,600), ylim = c(-4300,-3800))
 

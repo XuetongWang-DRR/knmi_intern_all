@@ -1,6 +1,4 @@
-
-
-##########Preparation part########################################################################
+######Preparing Radar data###################################################
 new = read.table("E:/output/time_information.txt", sep = "\t", header = T)
 #new$dates = with_tz(new$dates,tzone = "UTC")
 #new$dates = new$dates +hours(1)
@@ -29,369 +27,69 @@ library(dplyr)
 
 
 
-  PP = function(data){
-    data$grid = as.numeric(substr(data$second_category,12,15))
-    
-    data$dftime = as.POSIXct("2000-1-1 01:00:00", tz = "UTC")
-    year(data$dftime) = as.numeric(substr(data$first_category,10,13))
-    month(data$dftime) = as.numeric(substr(data$first_category,14,15))
-    mday(data$dftime) = as.numeric(substr(data$first_category,16,17))
-    hour(data$dftime) = as.numeric(substr(data$first_category,18,19))
-    minute(data$dftime) = 00
-    second(data$dftime) = 00
-    data$dftime = as.character(data$dftime)
-    
-    ECsub = data[,2:5]
-    Rsub = Rdata[,1:2]
-    ECmatch = left_join(ECsub,Rsub,by = c("dftime"="Rtime"))
-    data = cbind.data.frame(data,ECmatch$RmatchID)
-    data = data[which(data$`ECmatch$RmatchID` <665 | data$`ECmatch$RmatchID` >783 & data$`ECmatch$RmatchID`<1517
-                      | data$`ECmatch$RmatchID`>1635 & data$`ECmatch$RmatchID`<2365 ),]   
-    
+PP = function(data){
+  data$grid = as.numeric(substr(data$second_category,12,15))
+  
+  data$dftime = as.POSIXct("2000-1-1 01:00:00", tz = "UTC")
+  year(data$dftime) = as.numeric(substr(data$first_category,10,13))
+  month(data$dftime) = as.numeric(substr(data$first_category,14,15))
+  mday(data$dftime) = as.numeric(substr(data$first_category,16,17))
+  hour(data$dftime) = as.numeric(substr(data$first_category,18,19))
+  minute(data$dftime) = 00
+  second(data$dftime) = 00
+  data$dftime = as.character(data$dftime)
+  
+  ECsub = data[,2:5]
+  Rsub = Rdata[,1:2]
+  ECmatch = left_join(ECsub,Rsub,by = c("dftime"="Rtime"))
+  data = cbind.data.frame(data,ECmatch$RmatchID)
+  data = data[which(data$`ECmatch$RmatchID` <665 | data$`ECmatch$RmatchID` >783 & data$`ECmatch$RmatchID`<1517
+                    | data$`ECmatch$RmatchID`>1635 & data$`ECmatch$RmatchID`<2365 ),]   
+}
 
-  }
-  
-  result <- list(RRmean, RRsd, RRmedian, RRq10, RRq25, RRq75, RRq90, RRp0.05, RRp0.3, RRp10, RRp20, RRmin, RRmax, 
-                 RRHRES, WSPDmean, WSPDsd, WSPDmedian,WSPDq10, WSPDq25, WSPDq75, WSPDq90, WSPDmin, WSPDmax, WSPDHRES, 
-                 T2Mmean, T2Msd, T2Mmedian, T2Mq10, T2Mq25, T2Mq75, T2Mq90, T2Mmin, T2Mmax, T2MHRES, EVAmean, EVAsd, 
-                 EVAmedian, EVAq10, EVAq25, EVAq75, EVAq90, EVAmin, EVAmax, EVAHRES, DPTmean, DPTmedian, DPTsd, DPTq10,
-                 DPTq25, DPTq75, DPTq90, DPTmin, DPTmax, DPTHRES, CONRRmean, CONRRmedian, CONRRsd, CONRRq10, CONRRq25, 
-                 CONRRq75, CONRRq90, CONRRp0.05, CONRRp0.3, CONRRp10, CONRRp20, CONRRmin, CONRRmax, CONRRHRES, CCmean, 
-                 CCmedian, CCsd, CCq10, CCq25, CCq75, CCq90, CCmin, CCmax, CCHRES, CAPEmean, CAPEmedian, CAPEsd, 
-                 CAPEq10, CAPEq25, CAPEq75, CAPEq90, CAPEmin, CAPEmax, CAPEHRES, CAPESmean, CAPESmedian, CAPESsd, 
-                 CAPESq10, CAPESq25, CAPESq75, CAPESq90, CAPESmin, CAPESmax, CAPESHRES) %>%  lapply(PP)  
-   
-  
-  RRmean = as.data.frame(result[1])
-  RRsd =  as.data.frame(result[2])
-  RRmedian =  as.data.frame(result[3]) 
-  RRq10 = as.data.frame(result[4])
-  RRq25 =  as.data.frame(result[5])
-  RRq75 = as.data.frame(result[6])
-  RRq90 = as.data.frame(result[7])
-  RRp0.05 = as.data.frame(result[8])
-  RRp0.3 = as.data.frame(result[9])
-  RRp10 = as.data.frame(result[10])
-  RRp20 = as.data.frame(result[11])
-  RRmin = as.data.frame(result[12]) 
-  RRmax = as.data.frame(result[13])
-  RRHRES = as.data.frame(result[14])
-  WSPDmean = as.data.frame(result[15])
-  WSPDsd = as.data.frame(result[16])
-  WSPDmedian = as.data.frame(result[17])
-  WSPDq10 = as.data.frame(result[18]) 
-  WSPDq25 = as.data.frame(result[19])
-  WSPDq75 = as.data.frame(result[20])
-  WSPDq90 = as.data.frame(result[21])
-  WSPDmin = as.data.frame(result[22])
-  WSPDmax = as.data.frame(result[23])
-  WSPDHRES = as.data.frame(result[24]) 
-  T2Mmean = as.data.frame(result[25])
-  T2Msd = as.data.frame(result[26])
-  T2Mmedian = as.data.frame(result[27])
-  T2Mq10 = as.data.frame(result[28])
-  T2Mq25 = as.data.frame(result[29])
-  T2Mq75 = as.data.frame(result[30])
-  T2Mq90 = as.data.frame(result[31])
-  T2Mmin = as.data.frame(result[32])
-  T2Mmax = as.data.frame(result[33])
-  T2MHRES = as.data.frame(result[34])
-  EVAmean = as.data.frame(result[35])
-  EVAsd = as.data.frame(result[36])
-  EVAmedian = as.data.frame(result[37])
-  EVAq10 = as.data.frame(result[38])
-  EVAq25 = as.data.frame(result[39])
-  EVAq75 = as.data.frame(result[40])
-  EVAq90 = as.data.frame(result[41])
-  EVAmin = as.data.frame(result[42])
-  EVAmax = as.data.frame(result[43])
-  EVAHRES = as.data.frame(result[44])
-  DPTmean = as.data.frame(result[45])
-  DPTmedian = as.data.frame(result[46])
-  DPTsd = as.data.frame(result[47])
-  DPTq10 = as.data.frame(result[48])
-  DPTq25 = as.data.frame(result[49])
-  DPTq75 = as.data.frame(result[50])
-  DPTq90 = as.data.frame(result[51])
-  DPTmin = as.data.frame(result[52])
-  DPTmax = as.data.frame(result[53])
-  DPTHRES = as.data.frame(result[54])
-  CONRRmean = as.data.frame(result[55])
-  CONRRmedian = as.data.frame(result[56])
-  CONRRsd = as.data.frame(result[57])
-  CONRRq10 = as.data.frame(result[58])
-  CONRRq25 = as.data.frame(result[59])
-  CONRRq75 = as.data.frame(result[60])
-  CONRRq90 = as.data.frame(result[61])
-  CONRRp0.05 = as.data.frame(result[62])
-  CONRRp0.3 = as.data.frame(result[63])
-  CONRRp10 = as.data.frame(result[64])
-  CONRRp20 = as.data.frame(result[65])
-  CONRRmin = as.data.frame(result[66])
-  CONRRmax = as.data.frame(result[67])
-  CONRRHRES = as.data.frame(result[68])
-  CCmean = as.data.frame(result[69])
-  CCmedian = as.data.frame(result[70])
-  CCsd = as.data.frame(result[71])
-  CCq10 = as.data.frame(result[72])
-  CCq25 = as.data.frame(result[73])
-  CCq75 = as.data.frame(result[74])
-  CCq90 = as.data.frame(result[75])
-  CCmin = as.data.frame(result[76])
-  CCmax = as.data.frame(result[77])
-  CCHRES = as.data.frame(result[78])
-  CAPEmean = as.data.frame(result[79])
-  CAPEmedian = as.data.frame(result[80])
-  CAPEsd = as.data.frame(result[81]) 
-  CAPEq10 = as.data.frame(result[82])
-  CAPEq25 = as.data.frame(result[83])
-  CAPEq75 = as.data.frame(result[84])
-  CAPEq90 = as.data.frame(result[85])
-  CAPEmin = as.data.frame(result[86])
-  CAPEmax = as.data.frame(result[87])
-  CAPEHRES = as.data.frame(result[88])
-  CAPESmean = as.data.frame(result[89])
-  CAPESmedian = as.data.frame(result[90])
-  CAPESsd = as.data.frame(result[91]) 
-  CAPESq10 = as.data.frame(result[92])
-  CAPESq25 = as.data.frame(result[93])
-  CAPESq75 = as.data.frame(result[94])
-  CAPESq90 = as.data.frame(result[95])
-  CAPESmin = as.data.frame(result[96])
-  CAPESmax = as.data.frame(result[97])
-  CAPESHRES = as.data.frame(result[98])
-  
- 
-  
-   
-  
-  
-
-
+result <- list(`RRmean` = RRmean, `RRsd` = RRsd, `RRmedian` = RRmedian, `RRq10` = RRq10, `RRq25` = RRq25, `RRq75` = RRq75,`RRq90`= RRq90, 
+               `RRp0.05` = RRp0.05,`RRp0.3` = RRp0.3, `RRp10` = RRp10, `RRp20` = RRp20, `RRmin` = RRmin, `RRmax` = RRmax, `RRHRES` = RRHRES, 
+               `WSPDmean` = WSPDmean, `WSPDsd` = WSPDsd, `WSPDmedian` = WSPDmedian,`WSPDq10` = WSPDq10, `WSPDq25` = WSPDq25, 
+               `WSPDq75` = WSPDq75, `WSPDq90` = WSPDq90, `WSPDmin` = WSPDmin, `WSPDmax` = WSPDmax, `WSPDHRES` = WSPDHRES, 
+               `T2Mmean` = T2Mmean, `T2Msd` = T2Msd, `T2Mmedian` = T2Mmedian, `T2Mq10` = T2Mq10, `T2Mq25` = T2Mq25, 
+               `T2Mq75` = T2Mq75, `T2Mq90` = T2Mq90, `T2Mmin` = T2Mmin, `T2Mmax` = T2Mmax, `T2MHRES` = T2MHRES, 
+               `EVAmean` = EVAmean, `EVAsd` = EVAsd, `EVAmedian` = EVAmedian, `EVAq10` = EVAq10, `EVAq25` = EVAq25, 
+               `EVAq75` = EVAq75, `EVAq90` = EVAq90, `EVAmin` = EVAmin, `EVAmax` = EVAmax, `EVAHRES` = EVAHRES, 
+               `DPTmean` = DPTmean, `DPTmedian` = DPTmedian, `DPTsd` = DPTsd, `DPTq10` = DPTq10, `DPTq25` = DPTq25, 
+               `DPTq75` = DPTq75, `DPTq90` = DPTq90, `DPTmin` = DPTmin, `DPTmax` = DPTmax, `DPTHRES` = DPTHRES, 
+               `CONRRmean` = CONRRmean, `CONRRmedian` = CONRRmedian, `CONRRsd` = CONRRsd, `CONRRq10` = CONRRq10, `CONRRq25` = CONRRq25, 
+               `CONRRq75` = CONRRq75, `CONRRq90` = CONRRq90, `CONRRp0.05` = CONRRp0.05, `CONRRp0.3` = CONRRp0.3, `CONRRp10` =  CONRRp10, 
+               `CONRRp20` = CONRRp20, `CONRRmin` = CONRRmin, `CONRRmax` = CONRRmax, `CONRRHRES` = CONRRHRES, 
+               `CCmean` = CCmean, `CCmedian` = CCmedian, `CCsd` = CCsd, `CCq10` = CCq10, `CCq25` = CCq25, 
+               `CCq75` = CCq75, `CCq90` = CCq90, `CCmin` = CCmin, `CCmax` = CCmax, `CCHRES` = CCHRES, 
+               `CAPEmean` = CAPEmean, `CAPEmedian` = CAPEmedian, `CAPEsd` = CAPEsd, `CAPEq10` = CAPEq10, `CAPEq25` = CAPEq25,
+               `CAPEq75` = CAPEq75, `CAPEq90` = CAPEq90, `CAPEmin` = CAPEmin, `CAPEmax` = CAPEmax, `CAPEHRES` = CAPEHRES,
+               `CAPESmean` = CAPESmean, `CAPESmedian` = CAPESmedian, `CAPESsd` = CAPESsd, `CAPESq10` = CAPESq10, `CAPESq25` = CAPESq25, 
+               `CAPESq75` = CAPESq75, `CAPESq90` = CAPESq90, `CAPESmin` = CAPESmin, `CAPESmax` = CAPESmax, `CAPESHRES` = CAPESHRES) %>%  lapply(PP)  
+result <- purrr::map(result, tibble::as_tibble)
+list2env(result, envir = .GlobalEnv)
 
 
 RRmeanfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
 RRmeanfinal <- RRmeanfinal[-(1:2),]
-EC4time <- as.data.frame(matrix(upscal_match$rID,nrow=601,ncol=1))
-EC4time <- EC4time[-(1:2),]
-RRsdfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-RRsdfinal <- RRsdfinal[-(1:2),]
-RRmedianfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-RRmedianfinal <- RRmedianfinal[-(1:2),]
-RRq10final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-RRq10final <- RRq10final[-(1:2),]
-RRq25final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-RRq25final <- RRq25final[-(1:2),]
-RRq75final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-RRq75final <- RRq75final[-(1:2),]
-RRq90final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-RRq90final <- RRq90final[-(1:2),]
-RRP0.05final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-RRP0.05final <- RRP0.05final[-(1:2),]
-RRP0.3final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-RRP0.3final <- RRP0.3final[-(1:2),]
-RRP10final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-RRP10final <- RRP10final[-(1:2),]
-RRP20final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-RRP20final <- RRP20final[-(1:2),]
-RRminfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-RRminfinal <- RRminfinal[-(1:2),]
-RRmaxfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-RRmaxfinal <- RRmaxfinal[-(1:2),]
-RRHRESfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-RRHRESfinal <- RRHRESfinal[-(1:2),]
-R4final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-R4final <- R4final[-(1:2),]
-EC4ID <- as.data.frame(matrix(upscal_match$rID,nrow = 601,ncol=1))
-EC4ID <- EC4ID[-(1:2),]
-R4ID <- as.data.frame(matrix(upscal_match$rID,nrow = 601,ncol=1))
-R4ID <- R4ID[-(1:2),]
 
 
-CONRRmeanfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CONRRmeanfinal <- CONRRmeanfinal[-(1:2),]
-CONRRsdfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CONRRsdfinal <- CONRRsdfinal[-(1:2),]
-CONRRmedianfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CONRRmedianfinal <- CONRRmedianfinal[-(1:2),]
-CONRRq10final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CONRRq10final <- CONRRq10final[-(1:2),]
-CONRRq25final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CONRRq25final <- CONRRq25final[-(1:2),]
-CONRRq75final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CONRRq75final <- CONRRq75final[-(1:2),]
-CONRRq90final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CONRRq90final <- CONRRq90final[-(1:2),]
-CONRRP0.05final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CONRRP0.05final <- CONRRP0.05final[-(1:2),]
-CONRRP0.3final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CONRRP0.3final <- CONRRP0.3final[-(1:2),]
-CONRRP10final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CONRRP10final <- CONRRP10final[-(1:2),]
-CONRRP20final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CONRRP20final <- CONRRP20final[-(1:2),]
-CONRRminfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CONRRminfinal <- CONRRminfinal[-(1:2),]
-CONRRmaxfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CONRRmaxfinal <- CONRRmaxfinal[-(1:2),]
-CONRRHRESfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CONRRHRESfinal <- CONRRHRESfinal[-(1:2),]
-
-WSPDmeanfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-WSPDmeanfinal <- WSPDmeanfinal[-(1:2),]
-WSPDsdfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-WSPDsdfinal <- WSPDsdfinal[-(1:2),]
-WSPDmedianfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-WSPDmedianfinal <- WSPDmedianfinal[-(1:2),]
-WSPDq10final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-WSPDq10final <- WSPDq10final[-(1:2),]
-WSPDq25final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-WSPDq25final <- WSPDq25final[-(1:2),]
-WSPDq75final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-WSPDq75final <- WSPDq75final[-(1:2),]
-WSPDq90final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-WSPDq90final <- WSPDq90final[-(1:2),]
-WSPDminfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-WSPDminfinal <- WSPDminfinal[-(1:2),]
-WSPDmaxfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-WSPDmaxfinal <- WSPDmaxfinal[-(1:2),]
-WSPDHRESfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-WSPDHRESfinal <- WSPDHRESfinal[-(1:2),]
+EC4time =RRsdfinal=RRmedianfinal=RRq10final=RRq25final=RRq75final=RRq90final=RRP0.05final=RRP0.3final=RRP10final=RRP20final=
+ RRminfinal=RRmaxfinal=RRHRESfinal=R4final=EC4ID=R4ID=CONRRmeanfinal=CONRRsdfinal=CONRRmedianfinal=CONRRq10final=CONRRq25final=CONRRq75final=
+ CONRRq90final=CONRRP0.05final=CONRRP0.3final=CONRRP10final=CONRRP20final=CONRRminfinal=CONRRmaxfinal=CONRRHRESfinal=WSPDmeanfinal=
+ WSPDsdfinal=WSPDmedianfinal=WSPDq10final=WSPDq25final=WSPDq75final=WSPDq90final=WSPDminfinal=WSPDmaxfinal=WSPDHRESfinal=DPTmeanfinal=
+ DPTsdfinal=DPTmedianfinal=DPTq10final=DPTq25final=DPTq75final=DPTq90final=DPTminfinal=DPTmaxfinal=DPTHRESfinal=T2Mmeanfinal=T2Msdfinal=
+ T2Mmedianfinal=T2Mq10final=T2Mq25final=T2Mq75final=T2Mq90final=T2Mminfinal=T2Mmaxfinal=T2MHRESfinal=EVAmeanfinal=EVAsdfinal=EVAmedianfinal=
+ EVAq10final=EVAq25final=EVAq75final=EVAq90final=EVAminfinal=EVAmaxfinal=EVAHRESfinal=CCmeanfinal=CCsdfinal=CCmedianfinal=CCq10final=
+ CCq25final=CCq75final=CCq90final=CCminfinal=CCmaxfinal=CCHRESfinal=CAPEmeanfinal=CAPEsdfinal=CAPEmedianfinal=CAPEq10final=CAPEq25final=
+ CAPEq75final=CAPEq90final=CAPEminfinal=CAPEmaxfinal=CAPEHRESfinal=CAPESmeanfinal=CAPESsdfinal=CAPESmedianfinal=CAPESq10final=
+ CAPESq25final=CAPESq75final=CAPESq90final=CAPESminfinal=CAPESmaxfinal=CAPESHRESfinal=RRmeanfinal
 
 
-DPTmeanfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-DPTmeanfinal <- DPTmeanfinal[-(1:2),]
-DPTsdfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-DPTsdfinal <- DPTsdfinal[-(1:2),]
-DPTmedianfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-DPTmedianfinal <- DPTmedianfinal[-(1:2),]
-DPTq10final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-DPTq10final <- DPTq10final[-(1:2),]
-DPTq25final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-DPTq25final <- DPTq25final[-(1:2),]
-DPTq75final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-DPTq75final <- DPTq75final[-(1:2),]
-DPTq90final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-DPTq90final <- DPTq90final[-(1:2),]
-DPTminfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-DPTminfinal <- DPTminfinal[-(1:2),]
-DPTmaxfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-DPTmaxfinal <- DPTmaxfinal[-(1:2),]
-DPTHRESfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-DPTHRESfinal <- DPTHRESfinal[-(1:2),]
-
-
-T2Mmeanfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-T2Mmeanfinal <- T2Mmeanfinal[-(1:2),]
-T2Msdfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-T2Msdfinal <- T2Msdfinal[-(1:2),]
-T2Mmedianfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-T2Mmedianfinal <- T2Mmedianfinal[-(1:2),]
-T2Mq10final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-T2Mq10final <- T2Mq10final[-(1:2),]
-T2Mq25final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-T2Mq25final <- T2Mq25final[-(1:2),]
-T2Mq75final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-T2Mq75final <- T2Mq75final[-(1:2),]
-T2Mq90final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-T2Mq90final <- T2Mq90final[-(1:2),]
-T2Mminfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-T2Mminfinal <- T2Mminfinal[-(1:2),]
-T2Mmaxfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-T2Mmaxfinal <- T2Mmaxfinal[-(1:2),]
-T2MHRESfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-T2MHRESfinal <- T2MHRESfinal[-(1:2),]
-
-EVAmeanfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-EVAmeanfinal <- EVAmeanfinal[-(1:2),]
-EVAsdfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-EVAsdfinal <- EVAsdfinal[-(1:2),]
-EVAmedianfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-EVAmedianfinal <- EVAmedianfinal[-(1:2),]
-EVAq10final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-EVAq10final <- EVAq10final[-(1:2),]
-EVAq25final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-EVAq25final <- EVAq25final[-(1:2),]
-EVAq75final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-EVAq75final <- EVAq75final[-(1:2),]
-EVAq90final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-EVAq90final <- EVAq90final[-(1:2),]
-EVAminfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-EVAminfinal <- EVAminfinal[-(1:2),]
-EVAmaxfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-EVAmaxfinal <- EVAmaxfinal[-(1:2),]
-EVAHRESfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-EVAHRESfinal <- EVAHRESfinal[-(1:2),]
-
-
-CCmeanfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CCmeanfinal <- CCmeanfinal[-(1:2),]
-CCsdfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CCsdfinal <- CCsdfinal[-(1:2),]
-CCmedianfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CCmedianfinal <- CCmedianfinal[-(1:2),]
-CCq10final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CCq10final <- CCq10final[-(1:2),]
-CCq25final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CCq25final <- CCq25final[-(1:2),]
-CCq75final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CCq75final <- CCq75final[-(1:2),]
-CCq90final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CCq90final <- CCq90final[-(1:2),]
-CCminfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CCminfinal <- CCminfinal[-(1:2),]
-CCmaxfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CCmaxfinal <- CCmaxfinal[-(1:2),]
-CCHRESfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CCHRESfinal <- CCHRESfinal[-(1:2),]
-
-CAPEmeanfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPEmeanfinal <- CAPEmeanfinal[-(1:2),]
-CAPEsdfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPEsdfinal <- CAPEsdfinal[-(1:2),]
-CAPEmedianfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPEmedianfinal <- CAPEmedianfinal[-(1:2),]
-CAPEq10final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPEq10final <- CAPEq10final[-(1:2),]
-CAPEq25final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPEq25final <- CAPEq25final[-(1:2),]
-CAPEq75final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPEq75final <- CAPEq75final[-(1:2),]
-CAPEq90final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPEq90final <- CAPEq90final[-(1:2),]
-CAPEminfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPEminfinal <- CAPEminfinal[-(1:2),]
-CAPEmaxfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPEmaxfinal <- CAPEmaxfinal[-(1:2),]
-CAPEHRESfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPEHRESfinal <- CAPEHRESfinal[-(1:2),]
-
-CAPESmeanfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPESmeanfinal <- CAPESmeanfinal[-(1:2),]
-CAPESsdfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPESsdfinal <- CAPESsdfinal[-(1:2),]
-CAPESmedianfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPESmedianfinal <- CAPESmedianfinal[-(1:2),]
-CAPESq10final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPESq10final <- CAPESq10final[-(1:2),]
-CAPESq25final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPESq25final <- CAPESq25final[-(1:2),]
-CAPESq75final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPESq75final <- CAPESq75final[-(1:2),]
-CAPESq90final <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPESq90final <- CAPESq90final[-(1:2),]
-CAPESminfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPESminfinal <- CAPESminfinal[-(1:2),]
-CAPESmaxfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPESmaxfinal <- CAPESmaxfinal[-(1:2),]
-CAPESHRESfinal <- as.data.frame(matrix(upscal_match$rID,nrow = 601, ncol = 1))
-CAPESHRESfinal <- CAPESHRESfinal[-(1:2),]
-
-
-test = unique(RRmean$ECmatch.RmatchID)
+test = unique(RRmean$`ECmatch$RmatchID`) 
 for (i in test){
   #  subdata = Rdata[which(Rdata$Rtime == i+hours(24)),]   
-  subdata = Rdata[which(Rdata$RmatchID == i+7),]
+  subdata = Rdata[which(Rdata$RmatchID == i+3),]
   
   #    rID = upscal_match[,1]
   #    dfID = upscal_match[,2]   
@@ -399,117 +97,112 @@ for (i in test){
   subdata = t(subdata)
   subdata = as.data.frame(subdata)
   colnames(subdata) = c(subdata[2,1])
-  subRRmean = RRmean[which(RRmean$ECmatch.RmatchID == i),]
-  subRRsd = RRsd[which(RRsd$ECmatch.RmatchID == i),]
-  subRRmedian = RRmedian[which(RRmedian$ECmatch.RmatchID == i),]
-  subRRq10 = RRq10[which(RRq10$ECmatch.RmatchID == i),]
-  subRRq25 = RRq25[which(RRq25$ECmatch.RmatchID == i),]
-  subRRq75 = RRq75[which(RRq75$ECmatch.RmatchID == i),]
-  subRRq90 = RRq90[which(RRq90$ECmatch.RmatchID == i),]
-  subRRp0.05 = RRp0.05[which(RRp0.05$ECmatch.RmatchID == i),]
-  subRRp0.3 = RRp0.3[which(RRp0.3$ECmatch.RmatchID == i),]
-  subRRp10 = RRp10[which(RRp10$ECmatch.RmatchID == i),]
-  subRRp20 = RRp20[which(RRp20$ECmatch.RmatchID == i),]
-  subRRmin = RRmin[which(RRmin$ECmatch.RmatchID == i),]
-  subRRmax = RRmax[which(RRmax$ECmatch.RmatchID == i),]
-  subRRHRES = RRHRES[which(RRHRES$ECmatch.RmatchID == i),]
+  subRRmean = RRmean[which(RRmean$`ECmatch$RmatchID` == i),]
+  subRRsd = RRsd[which(RRsd$`ECmatch$RmatchID` == i),]
+  subRRmedian = RRmedian[which(RRmedian$`ECmatch$RmatchID` == i),]
+  subRRq10 = RRq10[which(RRq10$`ECmatch$RmatchID` == i),]
+  subRRq25 = RRq25[which(RRq25$`ECmatch$RmatchID` == i),]
+  subRRq75 = RRq75[which(RRq75$`ECmatch$RmatchID` == i),]
+  subRRq90 = RRq90[which(RRq90$`ECmatch$RmatchID` == i),]
+  subRRp0.05 = RRp0.05[which(RRp0.05$`ECmatch$RmatchID` == i),]
+  subRRp0.3 = RRp0.3[which(RRp0.3$`ECmatch$RmatchID` == i),]
+  subRRp10 = RRp10[which(RRp10$`ECmatch$RmatchID` == i),]
+  subRRp20 = RRp20[which(RRp20$`ECmatch$RmatchID` == i),]
+  subRRmin = RRmin[which(RRmin$`ECmatch$RmatchID` == i),]
+  subRRmax = RRmax[which(RRmax$`ECmatch$RmatchID` == i),]
+  subRRHRES = RRHRES[which(RRHRES$`ECmatch$RmatchID` == i),]
   
-  subCONRRmean = CONRRmean[which(CONRRmean$ECmatch.RmatchID == i),]
-  subCONRRsd = CONRRsd[which(CONRRsd$ECmatch.RmatchID == i),]
-  subCONRRmedian = CONRRmedian[which(CONRRmedian$ECmatch.RmatchID == i),]
-  subCONRRq10 = CONRRq10[which(CONRRq10$ECmatch.RmatchID == i),]
-  subCONRRq25 = CONRRq25[which(CONRRq25$ECmatch.RmatchID == i),]
-  subCONRRq75 = CONRRq75[which(CONRRq75$ECmatch.RmatchID == i),]
-  subCONRRq90 = CONRRq90[which(CONRRq90$ECmatch.RmatchID == i),]
-  subCONRRp0.05 = CONRRp0.05[which(CONRRp0.05$ECmatch.RmatchID == i),]
-  subCONRRp0.3 = CONRRp0.3[which(CONRRp0.3$ECmatch.RmatchID == i),]
-  subCONRRp10 = CONRRp10[which(CONRRp10$ECmatch.RmatchID == i),]
-  subCONRRp20 = CONRRp20[which(CONRRp20$ECmatch.RmatchID == i),]
-  subCONRRmin = CONRRmin[which(CONRRmin$ECmatch.RmatchID == i),]
-  subCONRRmax = CONRRmax[which(CONRRmax$ECmatch.RmatchID == i),]
-  subCONRRHRES = CONRRHRES[which(CONRRHRES$ECmatch.RmatchID == i),]
+  subCONRRmean = CONRRmean[which(CONRRmean$`ECmatch$RmatchID` == i),]
+  subCONRRsd = CONRRsd[which(CONRRsd$`ECmatch$RmatchID` == i),]
+  subCONRRmedian = CONRRmedian[which(CONRRmedian$`ECmatch$RmatchID` == i),]
+  subCONRRq10 = CONRRq10[which(CONRRq10$`ECmatch$RmatchID` == i),]
+  subCONRRq25 = CONRRq25[which(CONRRq25$`ECmatch$RmatchID` == i),]
+  subCONRRq75 = CONRRq75[which(CONRRq75$`ECmatch$RmatchID` == i),]
+  subCONRRq90 = CONRRq90[which(CONRRq90$`ECmatch$RmatchID` == i),]
+  subCONRRp0.05 = CONRRp0.05[which(CONRRp0.05$`ECmatch$RmatchID` == i),]
+  subCONRRp0.3 = CONRRp0.3[which(CONRRp0.3$`ECmatch$RmatchID` == i),]
+  subCONRRp10 = CONRRp10[which(CONRRp10$`ECmatch$RmatchID` == i),]
+  subCONRRp20 = CONRRp20[which(CONRRp20$`ECmatch$RmatchID` == i),]
+  subCONRRmin = CONRRmin[which(CONRRmin$`ECmatch$RmatchID` == i),]
+  subCONRRmax = CONRRmax[which(CONRRmax$`ECmatch$RmatchID` == i),]
+  subCONRRHRES = CONRRHRES[which(CONRRHRES$`ECmatch$RmatchID` == i),]
   
-  subWSPDmean = WSPDmean[which(WSPDmean$ECmatch.RmatchID == i),]
-  subWSPDsd = WSPDsd[which(WSPDsd$ECmatch.RmatchID == i),]
-  subWSPDmedian = WSPDmedian[which(WSPDmedian$ECmatch.RmatchID == i),]
-  subWSPDq10 = WSPDq10[which(WSPDq10$ECmatch.RmatchID == i),]
-  subWSPDq25 = WSPDq25[which(WSPDq25$ECmatch.RmatchID == i),]
-  subWSPDq75 = WSPDq75[which(WSPDq75$ECmatch.RmatchID == i),]
-  subWSPDq90 = WSPDq90[which(WSPDq90$ECmatch.RmatchID == i),]
-  subWSPDmin = WSPDmin[which(WSPDmin$ECmatch.RmatchID == i),]
-  subWSPDmax = WSPDmax[which(WSPDmax$ECmatch.RmatchID == i),]
-  subWSPDHRES = WSPDHRES[which(WSPDHRES$ECmatch.RmatchID == i),]
+  subWSPDmean = WSPDmean[which(WSPDmean$`ECmatch$RmatchID` == i),]
+  subWSPDsd = WSPDsd[which(WSPDsd$`ECmatch$RmatchID` == i),]
+  subWSPDmedian = WSPDmedian[which(WSPDmedian$`ECmatch$RmatchID` == i),]
+  subWSPDq10 = WSPDq10[which(WSPDq10$`ECmatch$RmatchID` == i),]
+  subWSPDq25 = WSPDq25[which(WSPDq25$`ECmatch$RmatchID` == i),]
+  subWSPDq75 = WSPDq75[which(WSPDq75$`ECmatch$RmatchID` == i),]
+  subWSPDq90 = WSPDq90[which(WSPDq90$`ECmatch$RmatchID` == i),]
+  subWSPDmin = WSPDmin[which(WSPDmin$`ECmatch$RmatchID` == i),]
+  subWSPDmax = WSPDmax[which(WSPDmax$`ECmatch$RmatchID` == i),]
+  subWSPDHRES = WSPDHRES[which(WSPDHRES$`ECmatch$RmatchID` == i),]
   
-  subDPTmean = DPTmean[which(DPTmean$ECmatch.RmatchID == i),]
-  subDPTsd = DPTsd[which(DPTsd$ECmatch.RmatchID == i),]
-  subDPTmedian = DPTmedian[which(DPTmedian$ECmatch.RmatchID == i),]
-  subDPTq10 = DPTq10[which(DPTq10$ECmatch.RmatchID == i),]
-  subDPTq25 = DPTq25[which(DPTq25$ECmatch.RmatchID == i),]
-  subDPTq75 = DPTq75[which(DPTq75$ECmatch.RmatchID == i),]
-  subDPTq90 = DPTq90[which(DPTq90$ECmatch.RmatchID == i),]
-  subDPTmin = DPTmin[which(DPTmin$ECmatch.RmatchID == i),]
-  subDPTmax = DPTmax[which(DPTmax$ECmatch.RmatchID == i),]
-  subDPTHRES = DPTHRES[which(DPTHRES$ECmatch.RmatchID == i),]
+  subDPTmean = DPTmean[which(DPTmean$`ECmatch$RmatchID` == i),]
+  subDPTsd = DPTsd[which(DPTsd$`ECmatch$RmatchID` == i),]
+  subDPTmedian = DPTmedian[which(DPTmedian$`ECmatch$RmatchID` == i),]
+  subDPTq10 = DPTq10[which(DPTq10$`ECmatch$RmatchID` == i),]
+  subDPTq25 = DPTq25[which(DPTq25$`ECmatch$RmatchID` == i),]
+  subDPTq75 = DPTq75[which(DPTq75$`ECmatch$RmatchID` == i),]
+  subDPTq90 = DPTq90[which(DPTq90$`ECmatch$RmatchID` == i),]
+  subDPTmin = DPTmin[which(DPTmin$`ECmatch$RmatchID` == i),]
+  subDPTmax = DPTmax[which(DPTmax$`ECmatch$RmatchID` == i),]
+  subDPTHRES = DPTHRES[which(DPTHRES$`ECmatch$RmatchID` == i),]
   
-  subT2Mmean = T2Mmean[which(T2Mmean$ECmatch.RmatchID == i),]
-  subT2Msd = T2Msd[which(T2Msd$ECmatch.RmatchID == i),]
-  subT2Mmedian = T2Mmedian[which(T2Mmedian$ECmatch.RmatchID== i),]
-  subT2Mq10 = T2Mq10[which(T2Mq10$ECmatch.RmatchID== i),]
-  subT2Mq25 = T2Mq25[which(T2Mq25$ECmatch.RmatchID== i),]
-  subT2Mq75 = T2Mq75[which(T2Mq75$ECmatch.RmatchID== i),]
-  subT2Mq90 = T2Mq90[which(T2Mq90$ECmatch.RmatchID== i),]
-  subT2Mmin = T2Mmin[which(T2Mmin$ECmatch.RmatchID== i),]
-  subT2Mmax = T2Mmax[which(T2Mmax$ECmatch.RmatchID== i),]
-  subT2MHRES = T2MHRES[which(T2MHRES$ECmatch.RmatchID== i),]
+  subT2Mmean = T2Mmean[which(T2Mmean$`ECmatch$RmatchID` == i),]
+  subT2Msd = T2Msd[which(T2Msd$`ECmatch$RmatchID` == i),]
+  subT2Mmedian = T2Mmedian[which(T2Mmedian$`ECmatch$RmatchID`== i),]
+  subT2Mq10 = T2Mq10[which(T2Mq10$`ECmatch$RmatchID`== i),]
+  subT2Mq25 = T2Mq25[which(T2Mq25$`ECmatch$RmatchID`== i),]
+  subT2Mq75 = T2Mq75[which(T2Mq75$`ECmatch$RmatchID`== i),]
+  subT2Mq90 = T2Mq90[which(T2Mq90$`ECmatch$RmatchID`== i),]
+  subT2Mmin = T2Mmin[which(T2Mmin$`ECmatch$RmatchID`== i),]
+  subT2Mmax = T2Mmax[which(T2Mmax$`ECmatch$RmatchID`== i),]
+  subT2MHRES = T2MHRES[which(T2MHRES$`ECmatch$RmatchID`== i),]
   
-  subEVAmean = EVAmean[which(EVAmean$ECmatch.RmatchID== i),]
-  subEVAsd = EVAsd[which(EVAsd$ECmatch.RmatchID== i),]
-  subEVAmedian = EVAmedian[which(EVAmedian$ECmatch.RmatchID== i),]
-  subEVAq10 = EVAq10[which(EVAq10$ECmatch.RmatchID== i),]
-  subEVAq25 = EVAq25[which(EVAq25$ECmatch.RmatchID== i),]
-  subEVAq75 = EVAq75[which(EVAq75$ECmatch.RmatchID== i),]
-  subEVAq90 = EVAq90[which(EVAq90$ECmatch.RmatchID== i),]
-  subEVAmin = EVAmin[which(EVAmin$ECmatch.RmatchID== i),]
-  subEVAmax = EVAmax[which(EVAmax$ECmatch.RmatchID== i),]
-  subEVAHRES = EVAHRES[which(EVAHRES$ECmatch.RmatchID== i),]
+  subEVAmean = EVAmean[which(EVAmean$`ECmatch$RmatchID`== i),]
+  subEVAsd = EVAsd[which(EVAsd$`ECmatch$RmatchID`== i),]
+  subEVAmedian = EVAmedian[which(EVAmedian$`ECmatch$RmatchID`== i),]
+  subEVAq10 = EVAq10[which(EVAq10$`ECmatch$RmatchID`== i),]
+  subEVAq25 = EVAq25[which(EVAq25$`ECmatch$RmatchID`== i),]
+  subEVAq75 = EVAq75[which(EVAq75$`ECmatch$RmatchID`== i),]
+  subEVAq90 = EVAq90[which(EVAq90$`ECmatch$RmatchID`== i),]
+  subEVAmin = EVAmin[which(EVAmin$`ECmatch$RmatchID`== i),]
+  subEVAmax = EVAmax[which(EVAmax$`ECmatch$RmatchID`== i),]
+  subEVAHRES = EVAHRES[which(EVAHRES$`ECmatch$RmatchID`== i),]
   
-  subCCmean = CCmean[which(CCmean$ECmatch.RmatchID== i),]
-  subCCsd = CCsd[which(CCsd$ECmatch.RmatchID== i),]
-  subCCmedian = CCmedian[which(CCmedian$ECmatch.RmatchID== i),]
-  subCCq10 = CCq10[which(CCq10$ECmatch.RmatchID== i),]
-  subCCq25 = CCq25[which(CCq25$ECmatch.RmatchID== i),]
-  subCCq75 = CCq75[which(CCq75$ECmatch.RmatchID== i),]
-  subCCq90 = CCq90[which(CCq90$ECmatch.RmatchID== i),]
-  subCCmin = CCmin[which(CCmin$ECmatch.RmatchID== i),]
-  subCCmax = CCmax[which(CCmax$ECmatch.RmatchID== i),]
-  subCCHRES = CCHRES[which(CCHRES$ECmatch.RmatchID== i),]
+  subCCmean = CCmean[which(CCmean$`ECmatch$RmatchID`== i),]
+  subCCsd = CCsd[which(CCsd$`ECmatch$RmatchID`== i),]
+  subCCmedian = CCmedian[which(CCmedian$`ECmatch$RmatchID`== i),]
+  subCCq10 = CCq10[which(CCq10$`ECmatch$RmatchID`== i),]
+  subCCq25 = CCq25[which(CCq25$`ECmatch$RmatchID`== i),]
+  subCCq75 = CCq75[which(CCq75$`ECmatch$RmatchID`== i),]
+  subCCq90 = CCq90[which(CCq90$`ECmatch$RmatchID`== i),]
+  subCCmin = CCmin[which(CCmin$`ECmatch$RmatchID`== i),]
+  subCCmax = CCmax[which(CCmax$`ECmatch$RmatchID`== i),]
+  subCCHRES = CCHRES[which(CCHRES$`ECmatch$RmatchID`== i),]
   
-  subCAPEmean = CAPEmean[which(CAPEmean$ECmatch.RmatchID== i),]
-  subCAPEsd = CAPEsd[which(CAPEsd$ECmatch.RmatchID== i),]
-  subCAPEmedian = CAPEmedian[which(CAPEmedian$ECmatch.RmatchID== i),]
-  subCAPEq10 = CAPEq10[which(CAPEq10$ECmatch.RmatchID== i),]
-  subCAPEq25 = CAPEq25[which(CAPEq25$ECmatch.RmatchID== i),]
-  subCAPEq75 = CAPEq75[which(CAPEq75$ECmatch.RmatchID== i),]
-  subCAPEq90 = CAPEq90[which(CAPEq90$ECmatch.RmatchID== i),]
-  subCAPEmin = CAPEmin[which(CAPEmin$ECmatch.RmatchID== i),]
-  subCAPEmax = CAPEmax[which(CAPEmax$ECmatch.RmatchID== i),]
-  subCAPEHRES = CAPEHRES[which(CAPEHRES$ECmatch.RmatchID== i),]
+  subCAPEmean = CAPEmean[which(CAPEmean$`ECmatch$RmatchID`== i),]
+  subCAPEsd = CAPEsd[which(CAPEsd$`ECmatch$RmatchID`== i),]
+  subCAPEmedian = CAPEmedian[which(CAPEmedian$`ECmatch$RmatchID`== i),]
+  subCAPEq10 = CAPEq10[which(CAPEq10$`ECmatch$RmatchID`== i),]
+  subCAPEq25 = CAPEq25[which(CAPEq25$`ECmatch$RmatchID`== i),]
+  subCAPEq75 = CAPEq75[which(CAPEq75$`ECmatch$RmatchID`== i),]
+  subCAPEq90 = CAPEq90[which(CAPEq90$`ECmatch$RmatchID`== i),]
+  subCAPEmin = CAPEmin[which(CAPEmin$`ECmatch$RmatchID`== i),]
+  subCAPEmax = CAPEmax[which(CAPEmax$`ECmatch$RmatchID`== i),]
+  subCAPEHRES = CAPEHRES[which(CAPEHRES$`ECmatch$RmatchID`== i),]
   
-  subCAPESmean = CAPESmean[which(CAPESmean$ECmatch.RmatchID== i),]
-  subCAPESsd = CAPESsd[which(CAPESsd$ECmatch.RmatchID== i),]
-  subCAPESmedian = CAPESmedian[which(CAPESmedian$ECmatch.RmatchID== i),]
-  subCAPESq10 = CAPESq10[which(CAPESq10$ECmatch.RmatchID== i),]
-  subCAPESq25 = CAPESq25[which(CAPESq25$ECmatch.RmatchID== i),]
-  subCAPESq75 = CAPESq75[which(CAPESq75$ECmatch.RmatchID== i),]
-  subCAPESq90 = CAPESq90[which(CAPESq90$ECmatch.RmatchID== i),]
-  subCAPESmin = CAPESmin[which(CAPESmin$ECmatch.RmatchID== i),]
-  subCAPESmax = CAPESmax[which(CAPESmax$ECmatch.RmatchID== i),]
-  subCAPESHRES = CAPESHRES[which(CAPESHRES$ECmatch.RmatchID== i),]
-  
-  
-  
-  
-  
+  subCAPESmean = CAPESmean[which(CAPESmean$`ECmatch$RmatchID`== i),]
+  subCAPESsd = CAPESsd[which(CAPESsd$`ECmatch$RmatchID`== i),]
+  subCAPESmedian = CAPESmedian[which(CAPESmedian$`ECmatch$RmatchID`== i),]
+  subCAPESq10 = CAPESq10[which(CAPESq10$`ECmatch$RmatchID`== i),]
+  subCAPESq25 = CAPESq25[which(CAPESq25$`ECmatch$RmatchID`== i),]
+  subCAPESq75 = CAPESq75[which(CAPESq75$`ECmatch$RmatchID`== i),]
+  subCAPESq90 = CAPESq90[which(CAPESq90$`ECmatch$RmatchID`== i),]
+  subCAPESmin = CAPESmin[which(CAPESmin$`ECmatch$RmatchID`== i),]
+  subCAPESmax = CAPESmax[which(CAPESmax$`ECmatch$RmatchID`== i),]
+  subCAPESHRES = CAPESHRES[which(CAPESHRES$`ECmatch$RmatchID`== i),]
   
   
   
@@ -776,8 +469,37 @@ for (i in test){
   CAPESminfinal=cbind.data.frame(CAPESminfinal,ECCAPESCmin)
   CAPESmaxfinal=cbind.data.frame(CAPESmaxfinal,ECCAPESCmax)
   CAPESHRESfinal=cbind.data.frame(CAPESHRESfinal,ECCAPESCHRES)
-
+  
 }
+
+
+#process = function(data){
+#  data = data[,-1]
+#  data = as.matrix(data)
+#  dim(data) <- c(599*602,1)
+#}
+
+#result1 <- list(`RRmean` = RRmean, `RRsd` = RRsd, `RRmedian` = RRmedian, `RRq10` = RRq10, `RRq25` = RRq25, `RRq75` = RRq75,`RRq90`= RRq90, 
+#               `RRp0.05` = RRp0.05,`RRp0.3` = RRp0.3, `RRp10` = RRp10, `RRp20` = RRp20, `RRmin` = RRmin, `RRmax` = RRmax, `RRHRES` = RRHRES, 
+#               `WSPDmean` = WSPDmean, `WSPDsd` = WSPDsd, `WSPDmedian` = WSPDmedian,`WSPDq10` = WSPDq10, `WSPDq25` = WSPDq25, 
+#               `WSPDq75` = WSPDq75, `WSPDq90` = WSPDq90, `WSPDmin` = WSPDmin, `WSPDmax` = WSPDmax, `WSPDHRES` = WSPDHRES, 
+#               `T2Mmean` = T2Mmean, `T2Msd` = T2Msd, `T2Mmedian` = T2Mmedian, `T2Mq10` = T2Mq10, `T2Mq25` = T2Mq25, 
+#               `T2Mq75` = T2Mq75, `T2Mq90` = T2Mq90, `T2Mmin` = T2Mmin, `T2Mmax` = T2Mmax, `T2MHRES` = T2MHRES, 
+#               `EVAmean` = EVAmean, `EVAsd` = EVAsd, `EVAmedian` = EVAmedian, `EVAq10` = EVAq10, `EVAq25` = EVAq25, 
+#               `EVAq75` = EVAq75, `EVAq90` = EVAq90, `EVAmin` = EVAmin, `EVAmax` = EVAmax, `EVAHRES` = EVAHRES, 
+#               `DPTmean` = DPTmean, `DPTmedian` = DPTmedian, `DPTsd` = DPTsd, `DPTq10` = DPTq10, `DPTq25` = DPTq25, 
+#               `DPTq75` = DPTq75, `DPTq90` = DPTq90, `DPTmin` = DPTmin, `DPTmax` = DPTmax, `DPTHRES` = DPTHRES, 
+#               `CONRRmean` = CONRRmean, `CONRRmedian` = CONRRmedian, `CONRRsd` = CONRRsd, `CONRRq10` = CONRRq10, `CONRRq25` = CONRRq25, 
+#               `CONRRq75` = CONRRq75, `CONRRq90` = CONRRq90, `CONRRp0.05` = CONRRp0.05, `CONRRp0.3` = CONRRp0.3, `CONRRp10` =  CONRRp10, 
+#               `CONRRp20` = CONRRp20, `CONRRmin` = CONRRmin, `CONRRmax` = CONRRmax, `CONRRHRES` = CONRRHRES, 
+#               `CCmean` = CCmean, `CCmedian` = CCmedian, `CCsd` = CCsd, `CCq10` = CCq10, `CCq25` = CCq25, 
+#               `CCq75` = CCq75, `CCq90` = CCq90, `CCmin` = CCmin, `CCmax` = CCmax, `CCHRES` = CCHRES, 
+#               `CAPEmean` = CAPEmean, `CAPEmedian` = CAPEmedian, `CAPEsd` = CAPEsd, `CAPEq10` = CAPEq10, `CAPEq25` = CAPEq25,
+#               `CAPEq75` = CAPEq75, `CAPEq90` = CAPEq90, `CAPEmin` = CAPEmin, `CAPEmax` = CAPEmax, `CAPEHRES` = CAPEHRES,
+#               `CAPESmean` = CAPESmean, `CAPESmedian` = CAPESmedian, `CAPESsd` = CAPESsd, `CAPESq10` = CAPESq10, `CAPESq25` = CAPESq25, 
+#               `CAPESq75` = CAPESq75, `CAPESq90` = CAPESq90, `CAPESmin` = CAPESmin, `CAPESmax` = CAPESmax, `CAPESHRES` = CAPESHRES) %>%  lapply(process)  
+#result1 <- purrr::map(result1, tibble::as_tibble)
+#list2env(result1, envir = .GlobalEnv)
 
 
 
@@ -1123,34 +845,43 @@ final = cbind.data.frame(RRmeanfinal1,RRsdfinal1, RRmedianfinal1, RRq10final1,RR
 
 final[which(final$RRmeanfinal1 <0 ),1]<- 0
 setwd("E:/output")
-write.table(final, "48hour_forecast_alldata.txt", sep = "\t", col.names = T, row.names = F)
-final = read.table("E:/output/72hour_forecast_alldata.txt", sep = "\t", header = T)
+write.table(final, "144hour_forecast_alldata.txt", sep = "\t", col.names = T, row.names = F)
+final = read.table("E:/output/120hour_forecast_alldata.txt", sep = "\t", header = T)
 
 final = na.omit(final)
 final$R4final1 = as.numeric(final$R4final1)
 
 
-#########Make stratified random sample############################################################
-
 library(gamlss)
 library(dplyr)
-set.seed(1)
-final1 <- final %>%
-  group_by(EC4time1) %>%
-  sample_n(300)
+#set.seed(1)
+#final1 <- final %>%
+#  group_by(EC4time1) %>%
+#  sample_n(300)
 
 #final2 = setdiff(final, final1)
 #######divide the training and validation by year#################################################
+final = read.table("E:/output/final_analysis/144hours/144hour_forecast_alldata.txt", sep = "\t", header = T)
+
+final = na.omit(final)
+final$R4final1 = as.numeric(final$R4final1)
+
+
+library(gamlss)
+library(dplyr)
+library(scoringRules)
+library(gamlss)
+library(quantregForest)
+library(ranger)
+library(lubridate)
+#set.seed(1)
+#final1 <- final %>%
+#  group_by(EC4time1) %>%
+#  sample_n(300)
+
 final2018 = final[1:164126,]
 final2020 = setdiff(final,final2018)
-########Model with ZAGA######################################################################### 
-
-set.seed(1)
-final2020 <- final2020 %>%
-  group_by(EC4time1) %>%
-  sample_n(300)
-
-
+########Model with ZAGA#########################################################################
 mod0<-gamlss(R4final1~1, data=final2020, family=ZAGA)
 
 mod1 = stepGAICAll.A(mod0, scope=list(lower=~1,upper=~RRmeanfinal1+RRsdfinal1+ RRmedianfinal1+ RRq10final1+RRq25final1+RRq75final1+RRq90final1+ 
@@ -1212,9 +943,11 @@ mod1 = stepGAICAll.A(mod0, scope=list(lower=~1,upper=~RRmeanfinal1+RRsdfinal1+ R
                                      CAPESq90final1+CAPESminfinal1+CAPESmaxfinal1+CAPESHRESfinal1),
                      #direction = "forward",
                      steps = 3) 
-saveRDS(object = mod1, file = "24h_forecast_3rd_year_300sample_3step.rds")
+saveRDS(object = mod1, file = "144h_forecast_3rd_year_3step.rds")
 rm(mod1,mod0)
-######Make the predict for the new data##########################################################################
+
+
+
 prd  <- predictAll(mod1,newdata=final2018)
 prob <- 1:51 / 52
 new_data = as.data.frame(matrix(NA,nrow = 51, ncol = dim(final2018)[1]))
@@ -1222,8 +955,27 @@ for (i in 1:dim(final2018)[1]){
   new_data[,i]=sapply(prob, function(u) qZAGA(u, mu=prd$mu[i], sigma=prd$sigma[i], nu=prd$nu[i]))
 }
 new_data = as.data.frame(t(new_data))
+#write.table(new_data, "new_data_72hours_3steps.txt", sep = "\t", col.names = T, row.names = F)
+
+new_data$observation = final2018$R4final1
+library(scoringRules)
+#crps = as.data.frame(matrix(NA,nrow = dim(final2018)[1],ncol = 1))
+
+#for (i in 1:dim(final2018)[1]){
+#  sample = as.numeric(new_data[i,1:51])
+#  crps[i,]=crps_sample(y = new_data$observation[i],dat = sample)
+#}
+crps3 = read.table("E:/output/new_data_24hours_4steps.txt", sep = "\t", header = T)
+crps3$crps=apply(crps3,1,function(x) crps_sample(as.numeric(x['observation']),as.numeric(x[1:51]))) 
+clim=crps3$observation
+crps3$crps_clim=apply(crps3,1,function(x) crps_sample(as.numeric(x['observation']),clim))
+crps3$crpss=(mean(crps3$crps)-mean(crps3$crps_clim))/(-mean(crps3$crps_clim))
+crps3 = crps3[,53:55]
+write.table(crps3, "crps_72h_3steps.txt", sep = "\t", col.names = T, row.names = F)
+
+
 #For calculate the CDF
-CDF = as.data.frame(matrix(NA,nrow = 11, ncol = dim(final2018)[1]))
+CDF = as.data.frame(matrix(NA,nrow = 15, ncol = dim(final2018)[1]))
 for (i in 1:dim(final2018)[1]){
   CDF[1,i]=sapply(0.05, function(u) pZAGA(u, mu=prd$mu[i], sigma=prd$sigma[i], nu=prd$nu[i]))
   CDF[2,i]=sapply(0.1, function(u) pZAGA(u, mu=prd$mu[i], sigma=prd$sigma[i], nu=prd$nu[i]))
@@ -1236,76 +988,132 @@ for (i in 1:dim(final2018)[1]){
   CDF[9,i]=sapply(5, function(u) pZAGA(u, mu=prd$mu[i], sigma=prd$sigma[i], nu=prd$nu[i]))
   CDF[10,i]=sapply(7.5, function(u) pZAGA(u, mu=prd$mu[i], sigma=prd$sigma[i], nu=prd$nu[i]))
   CDF[11,i]=sapply(10, function(u) pZAGA(u, mu=prd$mu[i], sigma=prd$sigma[i], nu=prd$nu[i]))
+  CDF[12,i]=sapply(12.5, function(u) pZAGA(u, mu=prd$mu[i], sigma=prd$sigma[i], nu=prd$nu[i]))
+  CDF[13,i]=sapply(15, function(u) pZAGA(u, mu=prd$mu[i], sigma=prd$sigma[i], nu=prd$nu[i]))
+  CDF[14,i]=sapply(17.5, function(u) pZAGA(u, mu=prd$mu[i], sigma=prd$sigma[i], nu=prd$nu[i]))
+  CDF[15,i]=sapply(20, function(u) pZAGA(u, mu=prd$mu[i], sigma=prd$sigma[i], nu=prd$nu[i]))
 }
 CDF = as.data.frame(t(CDF))
-write.table(CDF, "CDF_48hour_5steps.txt", sep = "\t", col.names = T, row.names = F)
+write.table(CDF, "NCDF_72hour_3steps.txt", sep = "\t", col.names = T, row.names = F)
+
 library(verification)
 rm(CDF)
-CDF = read.table("E:/output/CDF_48hour_3steps.txt", sep = "\t", header = T)
-colnames(CDF) = c("V1","V2","V3","V4","V5","V6","V7","V8","V9","V10","V11")
+CDF = read.table("E:/output/NCDF_48hour_3steps.txt", sep = "\t", header = T)
+colnames(CDF) = c("V1","V2","V3","V4","V5","V6","V7","V8","V9","V10","V11","V12","V13","V14","V15")
 
 CDF = 1-CDF
 #final2018 = final[1:164126,]
 obs = as.data.frame(final2018$R4final1)
-obs$`final2018$R4final1`[which(obs$`final2018$R4final1` <= 7.5)] <- 100
-obs$`final2018$R4final1`[which(obs$`final2018$R4final1` >7.5 & obs$`final2018$R4final1` <100)] <- 1
-obs$`final2018$R4final1`[which(obs$`final2018$R4final1` == 100)] <- 0
-obs$`final2018$R4final1`[which(obs$`final2018$R4final1` <= 1)] <- 0
-obs$`final2018$R4final1`[which(obs$`final2018$R4final1` > 1)] <- 1
+obs$`final2018$R4final1`[which(obs$`final2018$R4final1` <= 15)] <- 0
+obs$`final2018$R4final1`[which(obs$`final2018$R4final1` > 15)] <- 1
 
-df = cbind.data.frame(CDF$V10,obs$`final2018$R4final1`)
+df = cbind.data.frame(CDF$V13,obs$`final2018$R4final1`)
 colnames(df) = c("pred","obs")
 A<- verify(df$obs, df$pred, frcst.type = "prob", obs.type = "binary")
-reliability.plot(A, titl = "Reliability diagram of 3 steps ZAGA with 7.5mm threshold (48h forecast)")
- 
+reliability.plot(A, titl = "Reliability diagram of 3 steps ZAGA with 20mm threshold (48h forecast)")
+
 brier = brier(df$obs,df$pred, bins=F)
 brier.ss = brier$ss
 brier.bs = brier$bs
 
 
 
+#######For qrf################################################################################
 
-######Calculate CRPS for each group of the data
-new_data$observation = final2018$R4final1
-library(scoringRules)
-crps = as.data.frame(matrix(NA,nrow = dim(final2018)[1],ncol = 1))
+qrF_model <- quantregForest(x = final2020[, !(names(final2020) %in% c("R4final1", "EC4time1", "EC4ID1","R4ID1"))], 
+                            y = final2020$R4final1,
+                            nodesize = 5,
+                            mtry = 3,
+                            ntree = 1000)
+saveRDS(object = qrF_model, file = "24h_forecast_100sample_5_3_1000_qrf.rds")
 
-for (i in 1:dim(final2018)[1]){
-  sample = as.numeric(new_data[i,1:51])
-  crps[i,]=crps_sample(y = new_data$observation[i],dat = sample)
-}
+mod1 = readRDS(file = "24h_forecast_ALLsample_5_5_500_qrf.rds")
+qrF_model = mod1
+
+qrF_prediction <-   predict(qrF_model,
+                            newdata = final2018[, !(names(final2018) %in% c("R4final1", "EC4time1", "EC4ID1","R4ID1"))],
+                            what = prob,
+                            all = TRUE)
+qrF_prediction = as.data.frame(qrF_prediction)
+colnames(qrF_prediction) = c(1:51)
+qrF_prediction$observation = final2018$R4final1
+
+qrf_crps <- crps_sample(y = final2018$R4final1, dat = qrF_prediction)
+mean(qrf_crps)
+
+crps3 = qrF_prediction
+crps3$crps=apply(crps3,1,function(x) crps_sample(as.numeric(x['observation']),as.numeric(x[1:51]))) 
 crps3$crps=apply(crps3,1,function(x) crps_sample(as.numeric(x['observation']),as.numeric(x[1:51]))) 
 clim=crps3$observation
 crps3$crps_clim=apply(crps3,1,function(x) crps_sample(as.numeric(x['observation']),clim))
+crps3$crpss=(mean(crps3$crps)-mean(crps3$crps_clim))/(-mean(crps3$crps_clim))
+crps3 = crps3[,53:55]
+write.table(crps3, "crps_24h_ALLsample_5_5_500.txt", sep = "\t", col.names = T, row.names = F)
+
+condEcdf <-   predict(qrF_model,
+                      newdata = final2018[, !(names(final2018) %in% c("R4final1", "EC4time1", "EC4ID1","R4ID1"))],
+                      what = ecdf,
+                      all = TRUE)
+
+CDF = as.data.frame(matrix(NA,nrow = dim(final2018)[1], ncol = 15))
+for (i in 1:164126){
+  CDF[i,1] = condEcdf[[i]](0.05)
+  CDF[i,2] = condEcdf[[i]](0.1)
+  CDF[i,3] = condEcdf[[i]](0.2)
+  CDF[i,4] = condEcdf[[i]](0.5)
+  CDF[i,5] = condEcdf[[i]](0.8)
+  CDF[i,6] = condEcdf[[i]](1)
+  CDF[i,7] = condEcdf[[i]](2)
+  CDF[i,8] = condEcdf[[i]](3)
+  CDF[i,9] = condEcdf[[i]](5)
+  CDF[i,10] = condEcdf[[i]](7.5)
+  CDF[i,11] = condEcdf[[i]](10)
+  CDF[i,12] = condEcdf[[i]](12.5)
+  CDF[i,13] = condEcdf[[i]](15)
+  CDF[i,14] = condEcdf[[i]](17.5)
+  CDF[i,15] = condEcdf[[i]](20)
+}  
+write.table(CDF, "NCDF_48hour_100sample_5_5_500_qrf.txt", sep = "\t", col.names = T, row.names = F)
+library(verification)
+
+rm(CDF)
+CDF = read.table("E:/output/NCDF_48hour_ALLsample_5_default_500_qrf.txt", sep = "\t", header = T)
+CDF = 1-CDF
+#final2018 = final[1:164126,]
+obs = as.data.frame(final2018$R4final1)
+obs$`final2018$R4final1`[which(obs$`final2018$R4final1` <= 15)] <- 0
+obs$`final2018$R4final1`[which(obs$`final2018$R4final1` > 15)] <- 1
+
+df = cbind.data.frame(CDF$V13,obs$`final2018$R4final1`)
+colnames(df) = c("pred","obs")
+A<- verify(df$obs, df$pred, frcst.type = "prob", obs.type = "binary")
+
+reliability.plot(A, titl = "Reliability diagram of qrf with 15mm threshold (48h forecast)")
+
+
+
+brier = brier(df$obs,df$pred, bins=F)
+brier.ss = brier$ss
+brier.bs = brier$bs
+
+
+#######Using ranger package for qrf#########################################################
+rf <- ranger(R4final1 ~ ., final2020[,1:99], quantreg = TRUE)
+pred <- predict(rf, final2018[,1:99], type = "quantiles", quantiles = prob)
+m = as.data.frame(pred$predictions)
+colnames(m) = c(1:51)
+m$observation = final2018$R4final1
+
+qrf_crps <- crps_sample(y = m$observation, dat = m)
+mean(qrf_crps)
+
+crps3 = m
+
+crps3$crps=apply(crps3,1,function(x) crps_sample(as.numeric(x['observation']),as.numeric(x[1:51]))) 
+clim=crps3$observation
+crps3$crps_clim=apply(crps3,1,function(x) crps_sample(as.numeric(x['observation']),clim))
+
 crps3$crpss=(crps3$crps-crps3$crps_clim)/(-crps3$crps_clim)
 
-
-
-#setwd("E:/output")
-write.table(new_data, "new_data_24hours_2steps.txt", sep = "\t", col.names = T, row.names = F)
-crps3 = read.table("E:/output/new_data_24hours_4steps.txt", sep = "\t", header = T)
-crpsdf = cbind.data.frame(crps)
-
-
-#####Verification part##################################################################################
-crps_2step = read.table("E:/output/crps_24hours_2steps_new.txt", sep = "\t", header = T)
-new_data = read.table("E:/output/new_data_24hours_2steps.txt", sep = "\t", header = T)
-mod1 = readRDS(file = "48h_forecast_3rd_year_5step.rds")
-
-
-
-
-
-
-
-step <- rep(c(2:9), times = 2)
-type <- rep(c('raw','forecast'),each = 8)
-
-value <- c(mean(crps_1$V1),mean(crps_1$V1),mean(crps_1$V1),mean(crps_1$V1),mean(crps_1$V1),mean(crps_1$V1),mean(crps_1$V1),
-           mean(crps_1$V1),mean(crps2$V1),mean(crps3$V1),mean(crps4$V1),mean(crps5$V1),
-           mean(crps6$V1),mean(crps7$V1),mean(crps8$V1),mean(qrf_crps))
-
-df <- data.frame(step = step, type = type, value = value)
-ggplot(data = df, mapping = aes(x = step, y = value, colour = type)) + geom_line()+ggtitle("crps comparasion for EMOS")
-
-library(reliabilitydiag)
+crps3 = crps3[,53:55]
+write.table(crps3, "crps_24h_100sample_ranger.txt", sep = "\t", col.names = T, row.names = F)
