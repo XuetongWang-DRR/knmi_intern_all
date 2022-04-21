@@ -861,7 +861,7 @@ library(dplyr)
 
 #final2 = setdiff(final, final1)
 #######divide the training and validation by year#################################################
-final = read.table("E:/output/final_analysis/144hours/144hour_forecast_alldata.txt", sep = "\t", header = T)
+final = read.table("E:/output/validating_model/144hours/144hour_forecast_alldata.txt", sep = "\t", header = T)
 
 final = na.omit(final)
 final$R4final1 = as.numeric(final$R4final1)
@@ -942,10 +942,16 @@ mod1 = stepGAICAll.A(mod0, scope=list(lower=~1,upper=~RRmeanfinal1+RRsdfinal1+ R
                                      CAPESmeanfinal1+CAPESsdfinal1+CAPESmedianfinal1+CAPESq10final1+CAPESq25final1+CAPESq75final1+
                                      CAPESq90final1+CAPESminfinal1+CAPESmaxfinal1+CAPESHRESfinal1),
                      #direction = "forward",
-                     steps = 3) 
-saveRDS(object = mod1, file = "144h_forecast_3rd_year_3step.rds")
+                     steps = 6) 
+saveRDS(object = mod1, file = "24h_forecast_3rd_year_6step.rds")
 rm(mod1,mod0)
 
+setwd("E:/output/new_model/72hours")
+mod1 = readRDS(file = "72h_forecast_3rd_year_3step.rds")
+mod2 = readRDS(file = "144h_forecast_ALLsample_5_3_500_qrf.rds")
+imp = mod2$importance
+mod1
+View(imp)
 
 
 prd  <- predictAll(mod1,newdata=final2018)
@@ -965,14 +971,18 @@ library(scoringRules)
 #  sample = as.numeric(new_data[i,1:51])
 #  crps[i,]=crps_sample(y = new_data$observation[i],dat = sample)
 #}
-crps3 = read.table("E:/output/new_data_24hours_4steps.txt", sep = "\t", header = T)
+crps3 = new_data
+library(scoringRules)
+#crps3 = read.table("E:/output/new_data_24hours_4steps.txt", sep = "\t", header = T)
 crps3$crps=apply(crps3,1,function(x) crps_sample(as.numeric(x['observation']),as.numeric(x[1:51]))) 
 clim=crps3$observation
 crps3$crps_clim=apply(crps3,1,function(x) crps_sample(as.numeric(x['observation']),clim))
 crps3$crpss=(mean(crps3$crps)-mean(crps3$crps_clim))/(-mean(crps3$crps_clim))
 crps3 = crps3[,53:55]
-write.table(crps3, "crps_72h_3steps.txt", sep = "\t", col.names = T, row.names = F)
+write.table(crps3, "crps_24h_4steps.txt", sep = "\t", col.names = T, row.names = F)
 
+prd  <- predictAll(mod1,newdata=final2018)
+prob <- 1:51 / 52
 
 #For calculate the CDF
 CDF = as.data.frame(matrix(NA,nrow = 15, ncol = dim(final2018)[1]))
@@ -994,7 +1004,7 @@ for (i in 1:dim(final2018)[1]){
   CDF[15,i]=sapply(20, function(u) pZAGA(u, mu=prd$mu[i], sigma=prd$sigma[i], nu=prd$nu[i]))
 }
 CDF = as.data.frame(t(CDF))
-write.table(CDF, "NCDF_72hour_3steps.txt", sep = "\t", col.names = T, row.names = F)
+write.table(CDF, "NCDF_144hour_3steps.txt", sep = "\t", col.names = T, row.names = F)
 
 library(verification)
 rm(CDF)
@@ -1027,7 +1037,7 @@ qrF_model <- quantregForest(x = final2020[, !(names(final2020) %in% c("R4final1"
                             ntree = 1000)
 saveRDS(object = qrF_model, file = "24h_forecast_100sample_5_3_1000_qrf.rds")
 
-mod1 = readRDS(file = "24h_forecast_ALLsample_5_5_500_qrf.rds")
+mod2 = readRDS(file = "96h_forecast_ALLsample_5_3_500_qrf.rds")
 qrF_model = mod1
 
 qrF_prediction <-   predict(qrF_model,
@@ -1073,7 +1083,7 @@ for (i in 1:164126){
   CDF[i,14] = condEcdf[[i]](17.5)
   CDF[i,15] = condEcdf[[i]](20)
 }  
-write.table(CDF, "NCDF_48hour_100sample_5_5_500_qrf.txt", sep = "\t", col.names = T, row.names = F)
+write.table(CDF, "NCDF_144hour_ALLsample_5_3_500_qrf.txt", sep = "\t", col.names = T, row.names = F)
 library(verification)
 
 rm(CDF)

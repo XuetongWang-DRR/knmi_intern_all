@@ -231,14 +231,43 @@ b$grid = rep(c(1:242), each = 40)
 library(ncdf4)
 library(raster)
 rb = nc_open("D:/ITC/KNMI/radar_data/09-20211013T195924Z-001/09/RAD_NL25_RAC_MFBS_01H_202009010200.nc")
-ra = raster("E:/RadarData/2021/02/RAD_NL25_RAC_MFBS_01H_202102030700.nc")+
-  raster("E:/RadarData/2021/02/RAD_NL25_RAC_MFBS_01H_202102030800.nc")+
-  raster("E:/RadarData/2021/02/RAD_NL25_RAC_MFBS_01H_202102030900.nc")+
-  raster("E:/RadarData/2021/02/RAD_NL25_RAC_MFBS_01H_202102031000.nc")+
-  raster("E:/RadarData/2021/02/RAD_NL25_RAC_MFBS_01H_202102031100.nc")+
-  raster("E:/RadarData/2021/02/RAD_NL25_RAC_MFBS_01H_202102031200.nc")
+ra = raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912290100.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912290200.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912290300.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912290400.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912290500.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912290600.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912290700.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912290800.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912290900.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912291000.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912291100.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912291200.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912291300.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912291400.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912291500.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912291600.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912291700.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912291800.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912291900.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912292000.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912292100.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912292200.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912292300.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912292400.nc")
+  
+  
+  
+  
+  
+  
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912272000.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912272100.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912272200.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912272300.nc")+
+  raster("E:/RadarData/2019/12/RAD_NL25_RAC_MFBS_01H_201912272400.nc")
 
-plot(ra, main = "Radar Precipitation for 6 hours (mm)", xlim = c(200,600), ylim = c(-4300,-3800))
+plot(ra, main = "Radar Precipitation for Dec 29, 2019", xlim = c(200,600), ylim = c(-4300,-3800))
 
 
 
@@ -408,7 +437,6 @@ location$ID = (1:dim(location)[1])
 #max RA 9*9
 new_ra1 = aggregate(ra, fact=9, expand=FALSE, fun=mean, na.rm=TRUE)
 #new_ra1 = aggregate(new_ra, fact=3, expand=FALSE, fun=max, na.rm=TRUE)
-
 lat = init(ra,'y')
 lat = as.data.frame(lat)
 
