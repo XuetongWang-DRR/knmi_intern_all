@@ -947,7 +947,7 @@ saveRDS(object = mod1, file = "24h_forecast_3rd_year_6step.rds")
 rm(mod1,mod0)
 
 setwd("E:/output/new_model/72hours")
-mod1 = readRDS(file = "72h_forecast_3rd_year_3step.rds")
+mod1 = readRDS(file = "24h_forecast_3rd_year_3step.rds")
 mod2 = readRDS(file = "144h_forecast_ALLsample_5_3_500_qrf.rds")
 imp = mod2$importance
 mod1
@@ -1037,8 +1037,8 @@ qrF_model <- quantregForest(x = final2020[, !(names(final2020) %in% c("R4final1"
                             ntree = 1000)
 saveRDS(object = qrF_model, file = "24h_forecast_100sample_5_3_1000_qrf.rds")
 
-mod2 = readRDS(file = "96h_forecast_ALLsample_5_3_500_qrf.rds")
-qrF_model = mod1
+mod2 = readRDS(file = "24h_forecast_ALLsample_5_3_500_qrf.rds")
+qrF_model = mod2
 
 qrF_prediction <-   predict(qrF_model,
                             newdata = final2018[, !(names(final2018) %in% c("R4final1", "EC4time1", "EC4ID1","R4ID1"))],

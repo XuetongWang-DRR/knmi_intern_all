@@ -59,7 +59,13 @@ df <- data.frame(x = x, y=y, value=value)
 library(ggplot2)
 #不作任何条形宽度和条形距离的调整
 ggplot(data = df, mapping = aes(x = factor(x), y = value, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("crpss")+
-  ggtitle("crpss comparasion") 
+  ggtitle("crpss comparasion") +
+  theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        plot.title = element_text(size = 20),
+        legend.text = element_text(size = 20),
+        legend.title = element_text(size = 20))
 
 library(verification)
 
@@ -1346,84 +1352,110 @@ rm(brier_144h_zaga,brier_144h_qrf,df_144h_zaga,df_144h_qrf,obs)
 
 rm(final_144h,final2018_144h,final2020_144h)
 
-#for making graph_0.05
+#df for 0.05 threshold
 x <- rep(c(24,48,72,96,120,144), each = 2)
 y <- rep(c('zaga','qrf'),times = 6)
-value <- c(brier.ss_24h_zaga_0.05,brier.ss_24h_qrf_0.05,brier.ss_48h_zaga_0.05,brier.ss_48h_qrf_0.05,
-           brier.ss_72h_zaga_0.05,brier.ss_72h_qrf_0.05,brier.ss_96h_zaga_0.05,brier.ss_96h_qrf_0.05,
-           brier.ss_120h_zaga_0.05,brier.ss_120h_qrf_0.05,brier.ss_144h_zaga_0.05,brier.ss_144h_qrf_0.05)
-
-#z <- c()
-df <- data.frame(x = x, y=y, value=value)
-#不作任何条形宽度和条形距离的调整
-ggplot(data = df, mapping = aes(x = factor(x), y = value, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+ylim(0,0.6)+xlab("lead time (h)")+ylab("brier skill score")+
-  ggtitle("Brier skill score comparison for 0.05 threshold") 
-
-#for making graph_0.5
-x <- rep(c(24,48,72,96,120,144), each = 2)
-y <- rep(c('zaga','qrf'),times = 6)
-value <- c(brier.ss_24h_zaga_0.5,brier.ss_24h_qrf_0.5,brier.ss_48h_zaga_0.5,brier.ss_48h_qrf_0.5,
-           brier.ss_72h_zaga_0.5,brier.ss_72h_qrf_0.5,brier.ss_96h_zaga_0.5,brier.ss_96h_qrf_0.5,
-           brier.ss_120h_zaga_0.5,brier.ss_120h_qrf_0.5,brier.ss_144h_zaga_0.5,brier.ss_144h_qrf_0.5)
-
-#z <- c()
-df <- data.frame(x = x, y=y, value=value)
-#不作任何条形宽度和条形距离的调整
-ggplot(data = df, mapping = aes(x = factor(x), y = value, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+ylim(0,0.6)+xlab("lead time (h)")+ylab("brier skill score")+
-  ggtitle("Brier skill score comparison for 0.5 threshold") 
+value1 <- c(brier.ss_24h_zaga_0.05,brier.ss_24h_qrf_0.05,brier.ss_48h_zaga_0.05,brier.ss_48h_qrf_0.05,
+            brier.ss_72h_zaga_0.05,brier.ss_72h_qrf_0.05,brier.ss_96h_zaga_0.05,brier.ss_96h_qrf_0.05,
+            brier.ss_120h_zaga_0.05,brier.ss_120h_qrf_0.05,brier.ss_144h_zaga_0.05,brier.ss_144h_qrf_0.05)
 
 
 
-#for making graph_1
-x <- rep(c(24,48,72,96,120,144), each = 2)
-y <- rep(c('zaga','qrf'),times = 6)
-value <- c(brier.ss_24h_zaga_1,brier.ss_24h_qrf_1,brier.ss_48h_zaga_1,brier.ss_48h_qrf_1,
-           brier.ss_72h_zaga_1,brier.ss_72h_qrf_1,brier.ss_96h_zaga_1,brier.ss_96h_qrf_1,
-           brier.ss_120h_zaga_1,brier.ss_120h_qrf_1,brier.ss_144h_zaga_1,brier.ss_144h_qrf_1)
+#df for 0.5 threshold
 
-#z <- c()
-df <- data.frame(x = x, y=y, value=value)
-#不作任何条形宽度和条形距离的调整
-ggplot(data = df, mapping = aes(x = factor(x), y = value, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+ylim(0,0.6)+xlab("lead time (h)")+ylab("brier skill score")+
-  ggtitle("Brier skill score comparison for 1 threshold") 
+value2 <- c(brier.ss_24h_zaga_0.5,brier.ss_24h_qrf_0.5,brier.ss_48h_zaga_0.5,brier.ss_48h_qrf_0.5,
+            brier.ss_72h_zaga_0.5,brier.ss_72h_qrf_0.5,brier.ss_96h_zaga_0.5,brier.ss_96h_qrf_0.5,
+            brier.ss_120h_zaga_0.5,brier.ss_120h_qrf_0.5,brier.ss_144h_zaga_0.5,brier.ss_144h_qrf_0.5)
 
 
-#for making graph_5
-x <- rep(c(24,48,72,96,120,144), each = 2)
-y <- rep(c('zaga','qrf'),times = 6)
-value <- c(brier.ss_24h_zaga_5,brier.ss_24h_qrf_5,brier.ss_48h_zaga_5,brier.ss_48h_qrf_5,
-           brier.ss_72h_zaga_5,brier.ss_72h_qrf_5,brier.ss_96h_zaga_5,brier.ss_96h_qrf_5,
-           brier.ss_120h_zaga_5,brier.ss_120h_qrf_5,brier.ss_144h_zaga_5,brier.ss_144h_qrf_5)
-
-#z <- c()
-df <- data.frame(x = x, y=y, value=value)
-#不作任何条形宽度和条形距离的调整
-ggplot(data = df, mapping = aes(x = factor(x), y = value, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("brier skill score")+
-  ggtitle("Brier skill score comparison for 5 threshold") 
-
-#for making graph_10
-x <- rep(c(24,48,72,96,120,144), each = 2)
-y <- rep(c('zaga','qrf'),times = 6)
-value <- c(brier.ss_24h_zaga_10,brier.ss_24h_qrf_10,brier.ss_48h_zaga_10,brier.ss_48h_qrf_10,
-           brier.ss_72h_zaga_10,brier.ss_72h_qrf_10,brier.ss_96h_zaga_10,brier.ss_96h_qrf_10,
-           brier.ss_120h_zaga_10,brier.ss_120h_qrf_10,brier.ss_144h_zaga_10,brier.ss_144h_qrf_10)
-
-#z <- c()
-df <- data.frame(x = x, y=y, value=value)
-#不作任何条形宽度和条形距离的调整
-ggplot(data = df, mapping = aes(x = factor(x), y = value, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("brier skill score")+
-  ggtitle("Brier skill score comparison for 10 threshold") 
+#df for 1 threshold
+value3 <- c(brier.ss_24h_zaga_1,brier.ss_24h_qrf_1,brier.ss_48h_zaga_1,brier.ss_48h_qrf_1,
+            brier.ss_72h_zaga_1,brier.ss_72h_qrf_1,brier.ss_96h_zaga_1,brier.ss_96h_qrf_1,
+            brier.ss_120h_zaga_1,brier.ss_120h_qrf_1,brier.ss_144h_zaga_1,brier.ss_144h_qrf_1)
 
 
-#for making graph_15
-x <- rep(c(24,48,72,96,120,144), each = 2)
-y <- rep(c('zaga','qrf'),times = 6)
-value <- c(brier.ss_24h_zaga_15,brier.ss_24h_qrf_15,brier.ss_48h_zaga_15,brier.ss_48h_qrf_15,
-           brier.ss_72h_zaga_15,brier.ss_72h_qrf_15,brier.ss_96h_zaga_15,brier.ss_96h_qrf_15,
-           brier.ss_120h_zaga_15,brier.ss_120h_qrf_15,brier.ss_144h_zaga_15,brier.ss_144h_qrf_15)
+#df for 5 threshold
+value4 <- c(brier.ss_24h_zaga_5,brier.ss_24h_qrf_5,brier.ss_48h_zaga_5,brier.ss_48h_qrf_5,
+            brier.ss_72h_zaga_5,brier.ss_72h_qrf_5,brier.ss_96h_zaga_5,brier.ss_96h_qrf_5,
+            brier.ss_120h_zaga_5,brier.ss_120h_qrf_5,brier.ss_144h_zaga_5,brier.ss_144h_qrf_5)
 
-#z <- c()
-df <- data.frame(x = x, y=y, value=value)
-#不作任何条形宽度和条形距离的调整
-ggplot(data = df, mapping = aes(x = factor(x), y = value, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("brier skill score")+
-  ggtitle("Brier skill score comparison for 15 threshold") 
+
+#df for 10 threshold
+value5 <- c(brier.ss_24h_zaga_10,brier.ss_24h_qrf_10,brier.ss_48h_zaga_10,brier.ss_48h_qrf_10,
+            brier.ss_72h_zaga_10,brier.ss_72h_qrf_10,brier.ss_96h_zaga_10,brier.ss_96h_qrf_10,
+            brier.ss_120h_zaga_10,brier.ss_120h_qrf_10,brier.ss_144h_zaga_10,brier.ss_144h_qrf_10)
+
+
+
+value6 <- c(brier.ss_24h_zaga_15,brier.ss_24h_qrf_15,brier.ss_48h_zaga_15,brier.ss_48h_qrf_15,
+            brier.ss_72h_zaga_15,brier.ss_72h_qrf_15,brier.ss_96h_zaga_15,brier.ss_96h_qrf_15,
+            brier.ss_120h_zaga_15,brier.ss_120h_qrf_15,brier.ss_144h_zaga_15,brier.ss_144h_qrf_15)
+
+df <- data.frame(x = x, y=y, value1=value1,value2=value2,value3=value3,value4=value4,
+                 value5=value5,value6=value6)
+
+
+
+p1<-ggplot(data = df, mapping = aes(x = factor(x), y = value1, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("brier skill score")+
+  ggtitle("threshold: 0.05mm/6h") +
+  scale_fill_discrete(name = "Method")+
+  theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
+        plot.title = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
+        legend.text = element_text(size = 20),
+        legend.title = element_text(size = 20))
+
+p2<-ggplot(data = df, mapping = aes(x = factor(x), y = value2, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("brier skill score")+
+  ggtitle("threshold: 0.5mm/6h") +
+  scale_fill_discrete(name = "Method")+
+  theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
+        plot.title = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
+        legend.text = element_text(size = 20),
+        legend.title = element_text(size = 20))
+
+
+p3<-ggplot(data = df, mapping = aes(x = factor(x), y = value3, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("brier skill score")+
+  ggtitle("threshold: 1mm/6h") +  
+  scale_fill_discrete(name = "Method")+
+  theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
+        plot.title = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
+        legend.text = element_text(size = 20),
+        legend.title = element_text(size = 20))
+
+p4<-ggplot(data = df, mapping = aes(x = factor(x), y = value4, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("brier skill score")+
+  ggtitle("threshold: 5mm/6h") +
+  scale_fill_discrete(name = "Method")+
+  theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
+        plot.title = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
+        legend.text = element_text(size = 20),
+        legend.title = element_text(size = 20))
+
+p5<-ggplot(data = df, mapping = aes(x = factor(x), y = value5, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("brier skill score")+
+  ggtitle("threshold: 10mm/6h") +
+  scale_fill_discrete(name = "Method")+
+  theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
+        plot.title = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
+        legend.text = element_text(size = 20),
+        legend.title = element_text(size = 20))
+
+p6<-ggplot(data = df, mapping = aes(x = factor(x), y = value6, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("brier skill score")+
+  ggtitle("threshold: 15mm/6h") +
+  scale_fill_discrete(name = "Method")+
+  theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
+        plot.title = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
+        legend.text = element_text(size = 20),
+        legend.title = element_text(size = 20))
+
+ggarrange(p1,p2,p3,p4,p5,p6,ncol = 2,nrow=3,common.legend = T,legend = "right")
+

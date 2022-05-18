@@ -412,7 +412,7 @@ ggplot(r %>% mutate(celln = 1:nrow(r))) + geom_point(aes(x = V3, y = V2, col = c
 head(as.data.frame(ra, xy=TRUE))
 
 ####resample the radar data #########################################
-ra = raster("E:/RadarData/2019/01/RAD_NL25_RAC_MFBS_01H_201901010100.nc")
+ra = raster("E:/RadarData/2018/12/RAD_NL25_RAC_MFBS_01H_201812210700.nc")
 #remove clutter points
 ra[397,369] = ra[397,370]= ra[445,352] = ra[445,353] = ra[435,309] = ra[435,310] =
   ra[436,309] = ra[436,310] = ra[504,281] = ra[504,282] = ra[504,283] = ra[505,282] =
@@ -440,6 +440,14 @@ new_ra1 = aggregate(ra, fact=9, expand=FALSE, fun=mean, na.rm=TRUE)
 lat = init(ra,'y')
 lat = as.data.frame(lat)
 
+#this block is only used for making map of the original radar data
+ra_matrix = rasterToPoints(ra)
+ra_matrix= as.data.frame(ra_matrix)
+colnames(ra_matrix)[1] <- 'lon'
+colnames(ra_matrix)[2] <- 'lat'
+ra_ra = merge(ra_matrix, location, by = c("lat","lon")) 
+rvi_table = read.delim("E:/KNMI_DATA/matchdata.txt", sep = "\t")
+ra_output = merge(ra_ra,rvi_table,by.x = "ID", by.y = "rID")
 
 
 data_matrix <- rasterToPoints(new_ra1)
@@ -454,9 +462,34 @@ radar_output = merge(new_ra,rvi_table,by.x = "ID", by.y = "rID")
 upscal_match_9km = cbind.data.frame(radar_output$ID,radar_output$df2id)
 colnames(upscal_match_9km) = c("rID","dfID")
 #write.table(upscal_match_9km, "upscal_match_9km.txt", sep = "\t", col.names = T, row.names = F)
+write.csv(radar_output,"matching.csv",sep = "\t", col.names = T, row.names = F)
 
-ggplot(radar_output) +
-  geom_point(aes(x = rLon, y= rLat, color = image1_image_data)) 
+par(mfrow = c(1,2))
+plot(ra,xlim = c(250,500),ylim = c(-4250,-3850),legend=F,axes=F,frame.plot=F,main = "Original radar map")
+plot(new_ra1,xlim = c(250,500),ylim = c(-4250,-3850),legend=F,axes=F,frame.plot=F, main = "Aggregated radar map")
+
+
+#p3 = ggplot(ra_output,aes(x = rLon, y= rLat))+geom_point(color='blue')+ xlab("lon")+ylab("lat")+
+#  theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
+#        legend.position = "none")
+  
+p3 = ggplot(ra_output) +
+  geom_point(aes(x = rLon, y= rLat),colour = "blue") +  geom_point(aes(x = df2lon, y= df2lat),colour = "red") +
+  xlab("lon")+ylab("lat")+
+  theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
+        legend.position = "none")
+
+  
+
+p4 = ggplot(radar_output) +
+  geom_point(aes(x = rLon, y= rLat),colour = "blue") +  geom_point(aes(x = df2lon, y= df2lat),colour = "red") +
+  xlab("lon")+ylab("lat")+
+  theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
+        legend.position = "none")
+
+
+
+ggarrange(p3,p4,ncol = 2,nrow=1,common.legend = F)
 
 
 

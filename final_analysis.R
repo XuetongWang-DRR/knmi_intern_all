@@ -1,11 +1,14 @@
-final analysis
-setwd("E:/output/new_model/24hours")
-mod_24h_ = readRDS(file = "24h_forecast_ALLsample_5_3_500_qrf.rds")
-mod1 = readRDS(file = "24h_forecast_3rd_year_3step.rds")
-
-
 
 ######crps comparasion###########################################
+######Load all packages#########################################
+library(gamlss) #This package is used for modeling ZAGA distribution (parametric model)
+library(dplyr) #This package is used for some data manipulation
+library(scoringRules) #This package is used for simulated forecast distributions by applying scoring rules, and for calculate CRPS
+library(quantregForest) #This package is used for modeling QRF (nonparametric model)
+library(lubridate) #This package is used for transfer time related information to a easy way
+library(verification) #This package is used for calculate brier score and make reliability plot
+library(ggplot2) #This package is used for making graphs
+library(ggpubr)  #This package is used for arranging graphs madde by ggplot2
 #setwd("E:/output/final_analysis/24hours")
 crps_24h_raw = read.table("E:/output/new_model/24hours/crps_24h_raw_forecast.txt", sep = "\t", header = T)
 crps_24h_zaga = read.table("E:/output/new_model/24hours/crps_24h_3steps.txt", sep = "\t", header = T)
@@ -68,7 +71,15 @@ df <- data.frame(x = x, y=y, value=value)
 library(ggplot2)
 #不作任何条形宽度和条形距离的调整
 ggplot(data = df, mapping = aes(x = factor(x), y = value, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("crpss")+
-  ggtitle("crpss comparison") 
+  ggtitle("crpss comparison") +
+  theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        plot.title = element_text(size = 20),
+        legend.text = element_text(size = 20),
+        legend.title = element_text(size = 20))
+
+
 
 
 #24h_zaga_0.05
@@ -92,7 +103,7 @@ colnames(df_24h_zaga) = c("pred","obs")
 
 #A<- verify(df_24h_zaga$obs, df_24h_zaga$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of zaga with 0.05mm threshold (24h forecast)")
+#reliability.plot(A,titl = "zaga with 0.05mm threshold (24h forecast)")
 
 
 brier_24h_zaga = brier(df_24h_zaga$obs,df_24h_zaga$pred, bins=F)
@@ -116,6 +127,11 @@ obs$`final2018_24h$R4final1`[which(obs$`final2018_24h$R4final1` > 0.05)] <- 1
 df_24h_qrf = cbind.data.frame(CDF_24h_qrf$V1,obs$`final2018_24h$R4final1`)
 
 colnames(df_24h_qrf) = c("pred","obs")
+#A<- verify(df_24h_qrf$obs, df_24h_qrf$pred, frcst.type = "prob", obs.type = "binary")
+
+#reliability.plot(A,titl = "qrf with 0.05mm threshold (24h forecast)")
+
+
 
 brier_24h_qrf = brier(df_24h_qrf$obs,df_24h_qrf$pred, bins=F)
 brier.ss_24h_qrf_0.05 = brier_24h_qrf$ss
@@ -130,6 +146,10 @@ obs$`final2018_24h$R4final1`[which(obs$`final2018_24h$R4final1` > 0.5)] <- 1
 df_24h_zaga = cbind.data.frame(CDF_24h_zaga$V4,obs$`final2018_24h$R4final1`)
 
 colnames(df_24h_zaga) = c("pred","obs")
+#A<- verify(df_24h_zaga$obs, df_24h_zaga$pred, frcst.type = "prob", obs.type = "binary")
+#par(cex.axis=1.4, cex.lab=1.3, cex.main=1.5, cex.sub=1)
+#reliability.plot(A,titl = "zaga with 0.5mm threshold (24h forecast)")
+
 
 brier_24h_zaga = brier(df_24h_zaga$obs,df_24h_zaga$pred, bins=F)
 brier.ss_24h_zaga_0.5 = brier_24h_zaga$ss
@@ -225,8 +245,9 @@ colnames(df_24h_zaga) = c("pred","obs")
 
 
 #A<- verify(df_24h_zaga$obs, df_24h_zaga$pred, frcst.type = "prob", obs.type = "binary")
+#par(cex.axis=1.4, cex.lab=1.3, cex.main=1.5, cex.sub=1)
+#reliability.plot(A,titl = "zaga with 10mm threshold (24h forecast)")
 
-#reliability.plot(A, titl = "Reliability diagram of zaga with 10mm threshold (24h forecast)")
 
 brier_24h_zaga = brier(df_24h_zaga$obs,df_24h_zaga$pred, bins=F)
 brier.ss_24h_zaga_10 = brier_24h_zaga$ss
@@ -241,9 +262,9 @@ df_24h_qrf = cbind.data.frame(CDF_24h_qrf$V11,obs$`final2018_24h$R4final1`)
 colnames(df_24h_qrf) = c("pred","obs")
 
 
-#A<- verify(df_24h_qrf$obs, df_24h_qrf$pred, frcst.type = "prob", obs.type = "binary")
+#B<- verify(df_24h_qrf$obs, df_24h_qrf$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of qrf with 10mm threshold (24h forecast)")
+#reliability.plot(B, titl = "qrf with 10mm threshold (24h forecast)")
 
 brier_24h_qrf = brier(df_24h_qrf$obs,df_24h_qrf$pred, bins=F)
 brier.ss_24h_qrf_10 = brier_24h_qrf$ss
@@ -262,7 +283,7 @@ df_24h_zaga = cbind.data.frame(CDF_24h_zaga$V13,obs$`final2018_24h$R4final1`)
 colnames(df_24h_zaga) = c("pred","obs")
 
 
-#A<- verify(df_24h_zaga$obs, df_24h_zaga$pred, frcst.type = "prob", obs.type = "binary")
+#C<- verify(df_24h_zaga$obs, df_24h_zaga$pred, frcst.type = "prob", obs.type = "binary")
 
 #reliability.plot(A, titl = "Reliability diagram of zaga with 15mm threshold (24h forecast)")
 
@@ -279,7 +300,7 @@ df_24h_qrf = cbind.data.frame(CDF_24h_qrf$V13,obs$`final2018_24h$R4final1`)
 
 colnames(df_24h_qrf) = c("pred","obs")
 
-#A<- verify(df_24h_qrf$obs, df_24h_qrf$pred, frcst.type = "prob", obs.type = "binary")
+#D<- verify(df_24h_qrf$obs, df_24h_qrf$pred, frcst.type = "prob", obs.type = "binary")
 
 #reliability.plot(A, titl = "Reliability diagram of qrf with 15mm threshold (24h forecast)")
 
@@ -312,7 +333,7 @@ colnames(df_48h_zaga) = c("pred","obs")
 
 #A<- verify(df_48h_zaga$obs, df_48h_zaga$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of zaga with 0.05mm threshold (48h forecast)")
+#reliability.plot(A,titl = "zaga with 0.05mm threshold (48h forecast)")
 
 brier_48h_zaga = brier(df_48h_zaga$obs,df_48h_zaga$pred, bins=F)
 brier.ss_48h_zaga_0.05 = brier_48h_zaga$ss
@@ -329,7 +350,7 @@ colnames(df_48h_qrf) = c("pred","obs")
 
 #A<- verify(df_48h_qrf$obs, df_48h_qrf$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of qrf with 0.05mm threshold (48h forecast)")
+#reliability.plot(A, titl = "qrf with 0.05mm threshold (48h forecast)")
 
 brier_48h_qrf = brier(df_48h_qrf$obs,df_48h_qrf$pred, bins=F)
 brier.ss_48h_qrf_0.05 = brier_48h_qrf$ss
@@ -435,7 +456,7 @@ colnames(df_48h_zaga) = c("pred","obs")
 
 #A<- verify(df_48h_zaga$obs, df_48h_zaga$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of zaga with 10mm threshold (48h forecast)")
+#reliability.plot(A, titl = "zaga with 10mm threshold (48h forecast)")
 
 
 brier_48h_zaga = brier(df_48h_zaga$obs,df_48h_zaga$pred, bins=F)
@@ -452,7 +473,7 @@ colnames(df_48h_qrf) = c("pred","obs")
 
 #A<- verify(df_48h_qrf$obs, df_48h_qrf$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of qrf with 10mm threshold (48h forecast)")
+#reliability.plot(A, titl = "qrf with 10mm threshold (48h forecast)")
 
 
 brier_48h_qrf = brier(df_48h_qrf$obs,df_48h_qrf$pred, bins=F)
@@ -473,8 +494,7 @@ colnames(df_48h_zaga) = c("pred","obs")
 
 
 #A<- verify(df_48h_zaga$obs, df_48h_zaga$pred, frcst.type = "prob", obs.type = "binary")
-
-#reliability.plot(A, titl = "Reliability diagram of zaga with 15mm threshold (48h forecast)")
+#reliability.plot(A, titl = "zaga with 15mm threshold (48h forecast)")
 
 brier_48h_zaga = brier(df_48h_zaga$obs,df_48h_zaga$pred, bins=F)
 brier.ss_48h_zaga_15 = brier_48h_zaga$ss
@@ -490,7 +510,7 @@ colnames(df_48h_qrf) = c("pred","obs")
 
 #A<- verify(df_48h_qrf$obs, df_48h_qrf$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of qrf with 15mm threshold (48h forecast)")
+#reliability.plot(A, titl = "qrf with 15mm threshold (48h forecast)")
 
 brier_48h_qrf = brier(df_48h_qrf$obs,df_48h_qrf$pred, bins=F)
 brier.ss_48h_qrf_15 = brier_48h_qrf$ss
@@ -939,7 +959,7 @@ colnames(df_120h_zaga) = c("pred","obs")
 
 #A<- verify(df_120h_zaga$obs, df_120h_zaga$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of zaga with 0.05mm threshold (120h forecast)")
+#reliability.plot(A, titl = "zaga with 0.05mm threshold (120h forecast)")
 
 brier_120h_zaga = brier(df_120h_zaga$obs,df_120h_zaga$pred, bins=F)
 brier.ss_120h_zaga_0.05 = brier_120h_zaga$ss
@@ -956,7 +976,7 @@ colnames(df_120h_qrf) = c("pred","obs")
 
 #A<- verify(df_120h_qrf$obs, df_120h_qrf$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of qrf with 0.05mm threshold (120h forecast)")
+#reliability.plot(A, titl = "qrf with 0.05mm threshold (120h forecast)")
 
 brier_120h_qrf = brier(df_120h_qrf$obs,df_120h_qrf$pred, bins=F)
 brier.ss_120h_qrf_0.05 = brier_120h_qrf$ss
@@ -1062,7 +1082,7 @@ colnames(df_120h_zaga) = c("pred","obs")
 
 #A<- verify(df_120h_zaga$obs, df_120h_zaga$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of zaga with 10mm threshold (120h forecast)")
+#reliability.plot(A, titl = "zaga with 10mm threshold (120h forecast)")
 
 
 brier_120h_zaga = brier(df_120h_zaga$obs,df_120h_zaga$pred, bins=F)
@@ -1079,7 +1099,7 @@ colnames(df_120h_qrf) = c("pred","obs")
 
 #A<- verify(df_120h_qrf$obs, df_120h_qrf$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of qrf with 10mm threshold (120h forecast)")
+#reliability.plot(A, titl = "qrf with 10mm threshold (120h forecast)")
 
 
 brier_120h_qrf = brier(df_120h_qrf$obs,df_120h_qrf$pred, bins=F)
@@ -1101,7 +1121,7 @@ colnames(df_120h_zaga) = c("pred","obs")
 
 #A<- verify(df_120h_zaga$obs, df_120h_zaga$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of zaga with 15mm threshold (120h forecast)")
+#reliability.plot(A, titl = "zaga with 15mm threshold (120h forecast)")
 
 brier_120h_zaga = brier(df_120h_zaga$obs,df_120h_zaga$pred, bins=F)
 brier.ss_120h_zaga_15 = brier_120h_zaga$ss
@@ -1117,7 +1137,7 @@ colnames(df_120h_qrf) = c("pred","obs")
 
 #A<- verify(df_120h_qrf$obs, df_120h_qrf$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of qrf with 15mm threshold (120h forecast)")
+#reliability.plot(A, titl = "qrf with 15mm threshold (120h forecast)")
 
 brier_120h_qrf = brier(df_120h_qrf$obs,df_120h_qrf$pred, bins=F)
 brier.ss_120h_qrf_15 = brier_120h_qrf$ss
@@ -1150,7 +1170,7 @@ colnames(df_144h_zaga) = c("pred","obs")
 
 #A<- verify(df_144h_zaga$obs, df_144h_zaga$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of zaga with 0.05mm threshold (144h forecast)")
+#reliability.plot(A, titl = "zaga with 0.05mm threshold (144h forecast)")
 
 brier_144h_zaga = brier(df_144h_zaga$obs,df_144h_zaga$pred, bins=F)
 brier.ss_144h_zaga_0.05 = brier_144h_zaga$ss
@@ -1167,7 +1187,7 @@ colnames(df_144h_qrf) = c("pred","obs")
 
 #A<- verify(df_144h_qrf$obs, df_144h_qrf$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of qrf with 0.05mm threshold (144h forecast)")
+#reliability.plot(A, titl = "qrf with 0.05mm threshold (144h forecast)")
 
 brier_144h_qrf = brier(df_144h_qrf$obs,df_144h_qrf$pred, bins=F)
 brier.ss_144h_qrf_0.05 = brier_144h_qrf$ss
@@ -1279,7 +1299,7 @@ colnames(df_144h_zaga) = c("pred","obs")
 
 #A<- verify(df_144h_zaga$obs, df_144h_zaga$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of zaga with 10mm threshold (144h forecast)")
+#reliability.plot(A, titl = "zaga with 10mm threshold (144h forecast)")
 
 
 brier_144h_zaga = brier(df_144h_zaga$obs,df_144h_zaga$pred, bins=F)
@@ -1296,7 +1316,7 @@ colnames(df_144h_qrf) = c("pred","obs")
 
 #A<- verify(df_144h_qrf$obs, df_144h_qrf$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of qrf with 10mm threshold (144h forecast)")
+#reliability.plot(A, titl = "qrf with 10mm threshold (144h forecast)")
 
 
 brier_144h_qrf = brier(df_144h_qrf$obs,df_144h_qrf$pred, bins=F)
@@ -1318,7 +1338,7 @@ colnames(df_144h_zaga) = c("pred","obs")
 
 #A<- verify(df_144h_zaga$obs, df_144h_zaga$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of zaga with 15mm threshold (144h forecast)")
+#reliability.plot(A, titl = "zaga with 15mm threshold (144h forecast)")
 
 brier_144h_zaga = brier(df_144h_zaga$obs,df_144h_zaga$pred, bins=F)
 brier.ss_144h_zaga_15 = brier_144h_zaga$ss
@@ -1334,7 +1354,7 @@ colnames(df_144h_qrf) = c("pred","obs")
 
 #A<- verify(df_144h_qrf$obs, df_144h_qrf$pred, frcst.type = "prob", obs.type = "binary")
 
-#reliability.plot(A, titl = "Reliability diagram of qrf with 15mm threshold (144h forecast)")
+#reliability.plot(A, titl = "qrf with 15mm threshold (144h forecast)")
 
 brier_144h_qrf = brier(df_144h_qrf$obs,df_144h_qrf$pred, bins=F)
 brier.ss_144h_qrf_15 = brier_144h_qrf$ss
@@ -1342,17 +1362,6 @@ rm(brier_144h_zaga,brier_144h_qrf,df_144h_zaga,df_144h_qrf,obs)
 
 rm(final_144h,final2018_144h,final2020_144h)
 
-#for making graph_0.05
-library(ggpubr)
-p1<-ggplot(df,aes(x=V1,y=V2))+
-  geom_point(aes(color=V5))+
-  theme_bw()
-p2<-ggplot(df,aes(x=V1,y=V3))+
-  geom_point(aes(color=V5))+
-  theme_bw()
-p3<-ggplot(df,aes(x=V1,y=V4))+
-  geom_point(aes(color=V5))+
-  theme_bw()
 
 #df for 0.05 threshold
 x <- rep(c(24,48,72,96,120,144), each = 2)
@@ -1399,51 +1408,63 @@ df <- data.frame(x = x, y=y, value1=value1,value2=value2,value3=value3,value4=va
 
 
 p1<-ggplot(data = df, mapping = aes(x = factor(x), y = value1, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("brier skill score")+
-  ggtitle("Brier skill score comparison for 0.05 threshold") +
+ ggtitle("threshold: 0.05mm/6h") +
   scale_fill_discrete(name = "Method")+
   theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
         plot.title = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
         legend.text = element_text(size = 20),
         legend.title = element_text(size = 20))
 
 p2<-ggplot(data = df, mapping = aes(x = factor(x), y = value2, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("brier skill score")+
-  ggtitle("Brier skill score comparison for 0.5 threshold") +
+  ggtitle("threshold: 0.5mm/6h") +
   scale_fill_discrete(name = "Method")+
   theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
         plot.title = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
         legend.text = element_text(size = 20),
         legend.title = element_text(size = 20))
 
 
 p3<-ggplot(data = df, mapping = aes(x = factor(x), y = value3, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("brier skill score")+
-  ggtitle("Brier skill score comparison for 1 threshold") +  
+  ggtitle("threshold: 1mm/6h") +  
   scale_fill_discrete(name = "Method")+
   theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
         plot.title = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
         legend.text = element_text(size = 20),
         legend.title = element_text(size = 20))
 
 p4<-ggplot(data = df, mapping = aes(x = factor(x), y = value4, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("brier skill score")+
-  ggtitle("Brier skill score comparison for 5 threshold") +
+  ggtitle("threshold: 5mm/6h") +
   scale_fill_discrete(name = "Method")+
   theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
         plot.title = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
         legend.text = element_text(size = 20),
         legend.title = element_text(size = 20))
 
 p5<-ggplot(data = df, mapping = aes(x = factor(x), y = value5, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("brier skill score")+
-  ggtitle("Brier skill score comparison for 10 threshold") +
+  ggtitle("threshold: 10mm/6h") +
   scale_fill_discrete(name = "Method")+
   theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
         plot.title = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
         legend.text = element_text(size = 20),
         legend.title = element_text(size = 20))
 
 p6<-ggplot(data = df, mapping = aes(x = factor(x), y = value6, fill = y)) + geom_bar(stat = 'identity', position = 'dodge')+xlab("lead time (h)")+ylab("brier skill score")+
-  ggtitle("Brier skill score comparison for 15 threshold") +
+  ggtitle("threshold: 15mm/6h") +
   scale_fill_discrete(name = "Method")+
   theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
         plot.title = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
         legend.text = element_text(size = 20),
         legend.title = element_text(size = 20))
 

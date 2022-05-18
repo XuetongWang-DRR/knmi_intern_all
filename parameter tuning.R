@@ -91,7 +91,12 @@ y <- c(crpss_24h_zaga_2steps,crpss_24h_zaga_3steps,crpss_24h_zaga_4steps,
        crpss_24h_zaga_8steps)
 df <- data.frame(x = x, y = y)
 ggplot(data = df, mapping = aes(x = x, y = y)) + geom_point(size = 5)+xlab("steps")+ylab("crpss")+
-  ggtitle("crpss comparison for ZAGA with 24h forecast lead time") 
+  ggtitle("crpss comparison for ZAGA ") +
+  theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
+        plot.title = element_text(size = 20))
+
 
 
 x = rep(c("24h"),times = 26)
@@ -111,7 +116,8 @@ df <- data.frame(x = x, y = y, z = z)
 df$z = factor(df$z)
 
 ggplot(data = df, mapping = aes(x = x, y = y, colour = z)) + geom_point(size = 3)+xlab("forecast time")+ylab("crpss")+
-  ggtitle("crpss comparison") 
+  ggtitle("crpss comparison") +
+
 
 
 
@@ -140,6 +146,9 @@ ggplot(data = df, mapping = aes(x = x, y = y, colour = z)) + geom_point(size = 3
   scale_color_manual(values = c("blue","black","red"),name = "Type")+
   xlab("Model")+ylab("crpss")+ggtitle("crpss comparison")+
   theme(axis.title.x = element_text(size = 15),axis.title.y = element_text(size = 15),
+        axis.ticks = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_text(size = 15),
         plot.title = element_text(size = 20),
         legend.text = element_text(size = 20),
         legend.title = element_text(size = 20))
